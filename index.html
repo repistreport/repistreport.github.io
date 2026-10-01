@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>REP İstanbul · Ticari</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #f4f3fb; }
+    iframe { display: block; width: 100%; height: 100%; border: 0; }
+  </style>
+</head>
+<body>
+  <!-- rep-app.com: Rep'i Google adresine yönlendirmeden içeride gösterir (çoklu Google hesabı /u/1/ hatasını aşmak için). -->
+  <iframe id="rep" title="REP İstanbul · Ticari" allow="clipboard-read; clipboard-write; fullscreen"></iframe>
+  <script>
+    var REP_EXEC = 'https://script.google.com/macros/s/AKfycbx4mEAtWPQ58RXYz4xexRi2AKTpD5B9MfkxSXKt1_ffuHvaj-emxlfKP2VV8uvFguNN/exec';
+    var q = new URLSearchParams(location.search);
+    q.set('kabuk', '1');
+    document.getElementById('rep').src = REP_EXEC + '?' + q.toString();
+  </script>
+</body>
+</html>
