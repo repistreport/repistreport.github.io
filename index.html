@@ -11,7 +11,8 @@
 </head>
 <body>
   <!-- rep-app.com: Rep'i Google adresine yönlendirmeden içeride gösterir (çoklu Google hesabı /u/1/ hatasını aşmak için). -->
-  <iframe id="rep" title="REP İstanbul · Ticari" allow="clipboard-read; clipboard-write; fullscreen"></iframe>
+  <!-- credentialless: Google çerezleri gönderilmez, böylece çoklu hesapta /u/1/ yönlendirmesi olmaz. -->
+  <iframe id="rep" credentialless title="REP İstanbul · Ticari" allow="clipboard-read; clipboard-write; fullscreen"></iframe>
   <script>
     var REP_EXEC = 'https://script.google.com/macros/s/AKfycbx4mEAtWPQ58RXYz4xexRi2AKTpD5B9MfkxSXKt1_ffuHvaj-emxlfKP2VV8uvFguNN/exec';
     var q = new URLSearchParams(location.search);
