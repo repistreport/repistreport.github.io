@@ -4,28 +4,57 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>REP İstanbul</title>
-  <style>
-    html, body { margin: 0; height: 100%; background: #f4f3fb; }
-    iframe { display: block; width: 100%; height: 100%; border: 0; }
-  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/kapi.css">
+  <!-- rep-app.com kapısı: Firebase girişi (kapi.js), yetki köprüden. Yol bu sayfaya özel. -->
+  <script>window.REP_YOL = 'ticari2';</script>
+  <script type="module" src="/kapi.js"></script>
 </head>
 <body>
-  <!-- rep-app.com kabuğu: önce köprü (RepApp_Kopru; giriş + güvenlik + yönlendirme), sonra seçilen uygulama aynı iframe'de açılır. -->
-  <!-- credentialless: Google çerezleri gönderilmez, böylece çoklu Google hesabında /u/1/ hatası olmaz. -->
-  <iframe id="rep" credentialless title="REP İstanbul" allow="clipboard-read; clipboard-write; fullscreen"></iframe>
-  <script>
-    var KOPRU_EXEC = 'https://script.google.com/macros/s/AKfycbz-HUdmwpaE2gnwK9pX28lNFIvAz9hB2rpcc3AsVTwvItUr9STu5k6kfFWY-Ivr9RACPA/exec';
-    var YOL = 'ticari2';
-    var cerceve = document.getElementById('rep');
-    var q = new URLSearchParams(location.search);
-    q.set('kabuk', '1'); if (YOL) q.set('yol', YOL);
-    cerceve.src = KOPRU_EXEC + '?' + q.toString();
-    // Köprü, kullanıcıyı doğrulayınca hedef uygulamanın adresini gönderir; yalnız Google Apps Script web uygulaması adresleri kabul edilir.
-    window.addEventListener('message', function(e) {
-      if (!/\.googleusercontent\.com$/.test(new URL(e.origin).hostname)) return;
-      var d = e.data || {};
-      if (d.repKopru === 'git' && /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec\?/.test(d.url || '')) cerceve.src = d.url;
-    });
-  </script>
+  <div id="kapi">
+    <aside class="marka">
+      <div class="ust"><span class="rep">rep<i>.</i></span><span class="sehir">İSTANBUL<br>FOTOĞRAF &amp; FİLM</span></div>
+      <div><h1>Şirketin nabzı,<br><span>tek ekranda.</span></h1><p>Giriş yaptığında kaldığın yerden devam edersin:<br>süren indirmeler, bekleyen kararlar ve son hareketler kokpitte seni bekler.</p></div>
+      <div class="alt"><span>REP İSTANBUL</span><span>rep-app.com</span></div>
+    </aside>
+    <main class="panel">
+      <div class="kart" id="kart">
+        <div class="rep">rep<i>.</i><small>İSTANBUL</small></div>
+        <p class="ust-baslik" id="ust-baslik">REP’E HOŞ GELDİNİZ</p>
+        <h2 id="baslik">İşinize odaklanın.</h2>
+        <p class="aciklama" id="aciklama">Hesabınızla giriş yapın.</p>
+
+        <form id="giris" autocomplete="on" hidden>
+          <button type="button" class="google" id="google"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.6l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.7 13.2l7.8 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.8-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg>Google ile giriş</button>
+          <div class="ayrac">YA DA</div>
+          <label for="eposta">E-posta</label>
+          <input id="eposta" name="username" type="email" autocomplete="username" required>
+          <label for="sifre">Şifre</label>
+          <input id="sifre" name="password" type="password" autocomplete="current-password" required>
+          <button type="submit" class="birincil"><span>Giriş yap</span><span aria-hidden="true">↗</span></button>
+          <div class="baglantilar">
+            <button type="button" class="metin-dugme" id="hesap-ac">Hesap oluştur</button>
+            <button type="button" class="metin-dugme" id="sifre-unuttum">Şifremi unuttum</button>
+          </div>
+        </form>
+
+        <div id="onay" hidden>
+          <button type="button" class="birincil" id="onayladim"><span>Onayladım</span><span aria-hidden="true">↗</span></button>
+          <div class="baglantilar">
+            <button type="button" class="metin-dugme" id="tekrar-gonder">Onay e-postasını yeniden gönder</button>
+            <button type="button" class="metin-dugme cikis">Çıkış</button>
+          </div>
+        </div>
+
+        <div id="secim" hidden>
+          <div class="uygulamalar" id="uygulamalar"></div>
+          <div class="baglantilar"><span></span><button type="button" class="metin-dugme cikis">Başka hesapla giriş yap</button></div>
+        </div>
+
+        <div class="durum" id="durum" role="status" aria-live="polite"></div>
+      </div>
+    </main>
+  </div>
 </body>
 </html>
