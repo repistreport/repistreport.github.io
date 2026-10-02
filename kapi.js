@@ -70,15 +70,16 @@ async function devam(user) {
   }
 }
 
-async function ac(user, y) {
-  durum(y.ad + ' açılıyor…'); mesgul(true);
-  try {
-    const r = await kopru({ islem: 'sec', idToken: await user.getIdToken(), yol: y.id, menu: MENU });
-    const c = document.createElement('iframe');
-    c.id = 'uygulama-cercevesi'; c.title = r.ad; c.setAttribute('credentialless', ''); c.allow = 'clipboard-read; clipboard-write; fullscreen'; c.src = r.url;
-    document.body.append(c); $('kapi').hidden = true;
-    document.title = 'REP İstanbul · ' + r.ad;
-  } catch (e) { durum(e.message, true); mesgul(false); }
+// Adres ilk cevapta gelir (tek istek, 03.10.2026); köprüye ikinci kez gidilmez. Menü (?menu=…) burada eklenir.
+function ac(user, y) {
+  if (!y.adres) { durum(y.ad + ' henüz açık değil.', true); return; }
+  durum(y.ad + ' açılıyor…');
+  const m = MENU.replace(/[^A-Za-z0-9_-]/g, '');
+  const c = document.createElement('iframe');
+  c.id = 'uygulama-cercevesi'; c.title = y.ad; c.setAttribute('credentialless', ''); c.allow = 'clipboard-read; clipboard-write; fullscreen';
+  c.src = y.adres + (m ? '&menu=' + encodeURIComponent(m) : '');
+  document.body.append(c); $('kapi').hidden = true;
+  document.title = 'REP İstanbul · ' + y.ad;
 }
 
 // Oturum değişince: onaylanmamış e-posta hesabı içeri alınmaz
