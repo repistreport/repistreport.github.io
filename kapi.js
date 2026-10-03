@@ -86,8 +86,8 @@ function ac(user, y) {
 // --- Kabuk (kullanıcı kararı 03.10.2026): hedef adresi olmayan yol menüyle açılır. Menü köprüden (Rep_Menu), her basamak kendi başına çalışan
 // bir modülü çerçevede açar; köprü açılışta tek kullanımlık bilet verir. Modül menüyü değiştirince ({ rep: 'menuYenile' }) menü yeniden okunur.
 let kabuk = null;
-async function kabukMenu() {
-  const r = await kopru({ islem: 'menu', idToken: await kabuk.user.getIdToken(), yol: kabuk.yol.id });
+async function kabukMenu(tazele) {
+  const r = await kopru({ islem: 'menu', idToken: await kabuk.user.getIdToken(), yol: kabuk.yol.id, tazele: tazele === true });
   kabuk.menu = r.menu;
   $('kb-kisi').textContent = r.ad || kabuk.user.email;
   const derinlik = (m, n = 0) => { const u = r.menu.find(x => x.id === m.ust); return u && n < 6 ? derinlik(u, n + 1) : n; };
@@ -129,7 +129,7 @@ async function kabukAc(user, y) {
   // Modülden gelen haber: yalnız Google'ın uygulama çerçevesinden ve yalnız "menüyü yenile"
   window.addEventListener('message', (e) => {
     let alan = ''; try { alan = new URL(e.origin).hostname; } catch (x) {}
-    if (/(^|\.)googleusercontent\.com$/.test(alan) && e.data && e.data.rep === 'menuYenile') kabukMenu().catch(() => {});
+    if (/(^|\.)googleusercontent\.com$/.test(alan) && e.data && e.data.rep === 'menuYenile') kabukMenu(true).catch(() => {});
   });
   try { await kabukMenu(); const m = MENU.replace(/[^A-Za-z0-9_æ-]/g, ''); if (m) kabukBasamak(m); }
   catch (e) { $('kb-bos').textContent = ''; $('kb-durum').textContent = e.message; $('kb-durum').classList.add('hata'); }
