@@ -83,3 +83,7 @@ button:disabled { cursor:wait; opacity:.6; }
 #kb-durum.hata { color:var(--hata); background:rgba(255,255,255,.9); }
 #kb-durum:empty { display:none; }
 @media (max-width:740px) { #kabuk { grid-template-columns:176px minmax(0,1fr); } .kb-marka { font-size:26px; } }
+/* Bekleme göstergesi: modül açılırken çerçevenin üstünde */
+#kb-bekle { position:absolute; inset:0; z-index:3; display:flex; flex-direction:column; gap:16px; align-items:center; justify-content:center; background:#f3f4fb; color:var(--soluk); font-size:15px; font-weight:600; }
+.kb-doner { width:38px; height:38px; border-radius:50%; border:4px solid var(--cizgi); border-top-color:var(--vurgu2); animation:kb-don .8s linear infinite; }
+@keyframes kb-don { to { transform:rotate(360deg); } }

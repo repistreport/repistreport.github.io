@@ -103,18 +103,27 @@ async function kabukMenu(tazele) {
   }));
   $('kb-bos').textContent = r.menu.length ? 'Menüden bir basamak seçin.' : 'Bu uygulamanın menüsünde henüz basamak yok.';
 }
+// Bekleme göstergesi (kullanıcı isteği 03.10.2026: 'çalışıyor mu çalışmıyor mu anlaşılmıyor'): modül açılırken ortada dönen işaret ve yazı
+function kabukBekle(yazi) {
+  const b = $('kb-bekle');
+  b.hidden = !yazi; $('kb-bekle-yazi').textContent = yazi || '';
+  if (!yazi) clearTimeout(kabuk.bekleSure);
+}
 async function kabukBasamak(id) {
   const m = (kabuk.menu || []).find(x => x.id === id);
   if (!m || !m.acik) return;
   kabuk.secili = id;
   document.querySelectorAll('.kb-basamak').forEach(b => b.classList.toggle('secili', b.dataset.id === id));
-  $('kb-durum').textContent = m.ad + ' açılıyor…'; $('kb-durum').classList.remove('hata');
+  $('kb-durum').textContent = ''; $('kb-durum').classList.remove('hata');
+  kabukBekle(m.ad + ' açılıyor');
   try {
     const r = await kopru({ islem: 'menuAc', idToken: await kabuk.user.getIdToken(), yol: kabuk.yol.id, menu: id });
     if (kabuk.secili !== id) return; // bu arada başka basamak seçildi
     const c = $('kb-cerceve'); c.title = r.ad; c.src = r.adres; c.hidden = false; $('kb-bos').hidden = true;
-    $('kb-durum').textContent = ''; document.title = 'REP İstanbul · ' + r.ad;
-  } catch (e) { $('kb-durum').textContent = e.message; $('kb-durum').classList.add('hata'); }
+    document.title = 'REP İstanbul · ' + r.ad;
+    // Bekleme göstergesi modül 'hazır' deyince kalkar ({ rep: 'hazir' }); demezse 25 sn sonra kalkar
+    clearTimeout(kabuk.bekleSure); kabuk.bekleSure = setTimeout(() => kabukBekle(''), 25000);
+  } catch (e) { kabukBekle(''); $('kb-durum').textContent = e.message; $('kb-durum').classList.add('hata'); }
 }
 async function kabukAc(user, y) {
   kabuk = { user, yol: y, menu: [], secili: '' };
@@ -122,6 +131,7 @@ async function kabukAc(user, y) {
   k.innerHTML = '<aside class="kb-menu"><div class="kb-marka">rep<i>.</i><small></small></div><nav id="kb-liste" aria-label="Menü"></nav>' +
     '<div class="kb-alt"><span id="kb-kisi"></span><button type="button" class="metin-dugme" id="kb-cikis">Çıkış</button></div></aside>' +
     '<main class="kb-govde"><div id="kb-durum" role="status" aria-live="polite"></div><div id="kb-bos">Menü okunuyor…</div>' +
+    '<div id="kb-bekle" role="status" aria-live="polite" hidden><span class="kb-doner"></span><span id="kb-bekle-yazi"></span></div>' +
     '<iframe id="kb-cerceve" hidden credentialless allow="clipboard-read; clipboard-write; fullscreen"></iframe></main>';
   k.querySelector('.kb-marka small').textContent = y.ad;
   document.body.append(k); $('kapi').hidden = true; document.title = 'REP İstanbul · ' + y.ad;
@@ -129,7 +139,9 @@ async function kabukAc(user, y) {
   // Modülden gelen haber: yalnız Google'ın uygulama çerçevesinden ve yalnız "menüyü yenile"
   window.addEventListener('message', (e) => {
     let alan = ''; try { alan = new URL(e.origin).hostname; } catch (x) {}
-    if (/(^|\.)googleusercontent\.com$/.test(alan) && e.data && e.data.rep === 'menuYenile') kabukMenu(true).catch(() => {});
+    if (!/(^|\.)googleusercontent\.com$/.test(alan) || !e.data) return;
+    if (e.data.rep === 'menuYenile') kabukMenu(true).catch(() => {});
+    if (e.data.rep === 'hazir') kabukBekle('');
   });
   try { await kabukMenu(); const m = MENU.replace(/[^A-Za-z0-9_æ-]/g, ''); if (m) kabukBasamak(m); }
   catch (e) { $('kb-bos').textContent = ''; $('kb-durum').textContent = e.message; $('kb-durum').classList.add('hata'); }
