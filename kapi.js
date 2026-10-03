@@ -54,7 +54,7 @@ async function devam(user) {
     }
     basliklar('MERHABA, ' + (r.ad || '').toLocaleUpperCase('tr-TR'), 'Uygulamanızı seçin.', 'Yetkili olduğunuz uygulamalar');
     $('uygulamalar').replaceChildren(...r.yollar.map(y => {
-      const b = document.createElement('button'); b.type = 'button'; b.className = 'uygulama'; const acilir = y.acik || y.kabuk; b.disabled = !acilir;
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'uygulama'; const acilir = y.acik || y.kabuk || y.modul; b.disabled = !acilir;
       const k = document.createElement('span'); k.className = 'kod'; k.textContent = y.urlYol;
       const m = document.createElement('span'); const t = document.createElement('b'); t.textContent = y.ad; const s = document.createElement('small'); s.textContent = (y.aciklama ? y.aciklama + ' · ' : '') + 'rep-app.com/' + y.urlYol.toLowerCase();
       m.append(t, s);
@@ -73,6 +73,7 @@ async function devam(user) {
 // Adres ilk cevapta gelir (tek istek, 03.10.2026); köprüye ikinci kez gidilmez. Menü (?menu=…) burada eklenir.
 function ac(user, y) {
   if (y.kabuk) return kabukAc(user, y);
+  if (y.modul) return modulAc(user, y);
   if (!y.adres) { durum(y.ad + ' henüz açık değil.', true); return; }
   durum(y.ad + ' açılıyor…');
   const m = MENU.replace(/[^A-Za-z0-9_-]/g, '');
@@ -81,6 +82,27 @@ function ac(user, y) {
   c.src = y.adres + (m ? '&menu=' + encodeURIComponent(m) : '');
   document.body.append(c); $('kapi').hidden = true;
   document.title = 'REP İstanbul · ' + y.ad;
+}
+
+// --- Modül yolu (kullanıcı kararı 04.10.2026): modül kendi başına yaşar. rep-app.com/<yol> adresinde giriş yapılır; köprü projeye bağlı tek kullanımlık
+// bilet verir, modül tam ekran ve kendi menüsüyle açılır (kabuk menüsü yok). Modül 'hazır' diyene kadar giriş kartı ve durum yazısı görünür.
+async function modulAc(user, y) {
+  goster(''); basliklar('HOŞ GELDİNİZ', y.ad, user.email); durum(y.ad + ' açılıyor…');
+  try {
+    const r = await kopru({ islem: 'modulAc', idToken: await user.getIdToken(), yol: y.id });
+    const c = document.createElement('iframe');
+    c.id = 'uygulama-cercevesi'; c.title = r.ad; c.setAttribute('credentialless', ''); c.allow = 'clipboard-read; clipboard-write; fullscreen'; c.style.visibility = 'hidden';
+    const goster2 = () => { c.style.visibility = ''; $('kapi').hidden = true; };
+    const sure = setTimeout(goster2, 30000);
+    window.addEventListener('message', (e) => {
+      let alan = ''; try { alan = new URL(e.origin).hostname; } catch (x) {}
+      if (!/(^|\.)googleusercontent\.com$/.test(alan) || !e.data) return;
+      if (e.data.rep === 'hazir') { clearTimeout(sure); goster2(); }
+      if (e.data.rep === 'cikis') signOut(auth).then(() => location.reload());
+    });
+    c.src = r.adres; document.body.append(c);
+    document.title = 'REP İstanbul · ' + r.ad;
+  } catch (e) { goster('secim'); $('uygulamalar').replaceChildren(); basliklar('GİRİŞ YAPILDI', 'Devam edilemedi.', user.email); durum(e.message, true); }
 }
 
 // --- Kabuk (kullanıcı kararı 03.10.2026): hedef adresi olmayan yol menüyle açılır. Menü köprüden (Rep_Menu), her basamak kendi başına çalışan
