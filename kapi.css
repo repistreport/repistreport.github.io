@@ -62,3 +62,24 @@ button:disabled { cursor:wait; opacity:.6; }
   .marka { padding:20px 23px; } .marka h1, .marka p, .marka .alt { display:none; }
   .panel { padding:21px 16px; } .kart { padding:26px 20px; border-radius:26px; }
 }
+
+/* Kabuk (menüyle açılan uygulama): solda menü, sağda modül çerçevesi */
+#kabuk { position:fixed; inset:0; display:grid; grid-template-columns:248px minmax(0,1fr); background:#f3f4fb; }
+.kb-menu { display:flex; flex-direction:column; padding:22px 14px 16px; background:rgba(255,255,255,.72); border-right:1px solid var(--cizgi); backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px); min-height:0; }
+.kb-marka { font-weight:700; font-size:34px; letter-spacing:-.05em; line-height:1; padding:0 8px 20px; }
+.kb-marka i { color:var(--vurgu2); font-style:normal; }
+.kb-marka small { display:block; font-size:10px; letter-spacing:2px; margin-top:8px; color:var(--soluk); font-weight:600; text-transform:uppercase; }
+#kb-liste { flex:1; overflow:auto; display:grid; gap:4px; align-content:start; }
+.kb-basamak { width:100%; text-align:left; border:0; border-radius:12px; padding:11px 16px; background:none; color:var(--murekkep); font-weight:600; font-size:14px; }
+.kb-basamak:hover:not(:disabled) { background:rgba(99,102,241,.1); }
+.kb-basamak.secili { background:var(--murekkep); color:#fff; }
+.kb-basamak:disabled { cursor:default; opacity:.45; }
+.kb-alt { display:flex; justify-content:space-between; align-items:center; gap:8px; border-top:1px solid var(--cizgi); padding:12px 8px 0; font-size:12px; color:var(--soluk); }
+.kb-alt span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.kb-govde { position:relative; min-width:0; min-height:0; }
+#kb-cerceve { position:absolute; inset:0; width:100%; height:100%; border:0; background:#f3f4fb; }
+#kb-bos { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--soluk); font-size:15px; }
+#kb-durum { position:absolute; left:0; right:0; top:0; z-index:2; padding:8px 16px; font-size:12px; color:var(--soluk); pointer-events:none; }
+#kb-durum.hata { color:var(--hata); background:rgba(255,255,255,.9); }
+#kb-durum:empty { display:none; }
+@media (max-width:740px) { #kabuk { grid-template-columns:176px minmax(0,1fr); } .kb-marka { font-size:26px; } }
