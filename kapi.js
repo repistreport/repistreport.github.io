@@ -121,8 +121,8 @@ async function kabukBasamak(id) {
     if (kabuk.secili !== id) return; // bu arada başka basamak seçildi
     const c = $('kb-cerceve'); c.title = r.ad; c.src = r.adres; c.hidden = false; $('kb-bos').hidden = true;
     document.title = 'REP İstanbul · ' + r.ad;
-    // Bekleme göstergesi modül 'hazır' deyince kalkar ({ rep: 'hazir' }); demezse 25 sn sonra kalkar
-    clearTimeout(kabuk.bekleSure); kabuk.bekleSure = setTimeout(() => kabukBekle(''), 25000);
+    // Bekleme göstergesi modül 'hazır' deyince kalkar ({ rep: 'hazir' }); demezse 90 sn sonra kalkar
+    clearTimeout(kabuk.bekleSure); kabuk.bekleSure = setTimeout(() => kabukBekle(''), 90000);
   } catch (e) { kabukBekle(''); $('kb-durum').textContent = e.message; $('kb-durum').classList.add('hata'); }
 }
 async function kabukAc(user, y) {
