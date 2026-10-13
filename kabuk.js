@@ -24,7 +24,7 @@ const bekle = (ms) => new Promise(r => setTimeout(r, ms));
 
 function stil() {
   return new Promise((bitti) => {
-    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=2', import.meta.url).href;
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=3', import.meta.url).href;
     l.onload = l.onerror = bitti; document.head.append(l);
   });
 }
@@ -59,11 +59,14 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
   document.body.append(k); document.title = 'REP İstanbul · ' + yol.ad;
   if (matchMedia('(max-width:860px)').matches) k.classList.add('dar');
 
-  // Gece / gündüz (kullanıcı isteği 13.10.2026): seçim bu tarayıcıda hatırlanır; ilk açılış gece
+  // Gece / gündüz (kullanıcı isteği 13.10.2026): seçim bu tarayıcıda hatırlanır; ilk açılış gece.
+  // Modül de uyar: ilk ton adresle gider (&tema=…), sonraki değişiklik açık modüle haberle ({ rep: 'tema' }; modül tarafı F020.tema)
+  let modulPencere = null;
   const TEMA_ANAHTAR = 'repkabuk.tema';
   const temaYaz = (gunduz) => {
     k.classList.toggle('gunduz', gunduz);
     $('tema').innerHTML = svg(gunduz ? 'gece' : 'gunduz'); $('tema').title = gunduz ? 'Geceye geç' : 'Gündüze geç'; $('tema').setAttribute('aria-pressed', gunduz);
+    if (modulPencere) try { modulPencere.postMessage({ rep: 'tema', tema: gunduz ? 'gunduz' : 'gece' }, '*'); } catch (e) {}
   };
   let gunduz = false; try { gunduz = localStorage.getItem(TEMA_ANAHTAR) === 'gunduz'; } catch (e) {}
   temaYaz(gunduz);
@@ -156,7 +159,8 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
     try {
       const r = await iste({ islem: 'menuAc', menu: m.id });
       if (no !== d.no) return; // bu arada başka basamak seçildi
-      const c = $('cerceve'); c.title = r.ad; c.src = r.adres;
+      const c = $('cerceve'); c.title = r.ad; modulPencere = null;
+      c.src = r.adres + (r.adres.includes('?') ? '&' : '?') + 'tema=' + (k.classList.contains('gunduz') ? 'gunduz' : 'gece');
       document.title = 'REP İstanbul · ' + r.ad;
       halYaz('Modül açılıyor'); a.style.width = '86%';
       // Modül "hazır" deyince biter ({ rep: 'hazir' }); demezse 90 sn sonra
@@ -198,7 +202,7 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
     let alan = ''; try { alan = new URL(e.origin).hostname; } catch (x) {}
     if (!/(^|\.)googleusercontent\.com$/.test(alan) || !e.data) return;
     if (e.data.rep === 'menuYenile') menuOku(true);
-    if (e.data.rep === 'hazir') bitir(d.no);
+    if (e.data.rep === 'hazir') { modulPencere = e.source; temaYaz(k.classList.contains('gunduz')); bitir(d.no); }
   });
   const saat = () => { $('saat').textContent = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }); }; saat(); setInterval(saat, 15000);
 

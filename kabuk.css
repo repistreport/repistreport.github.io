@@ -12,7 +12,7 @@
   --zemin:#08060d; --yazi:#f1eefb; --orta:#b3abc9; --soluk:#7d7596; --hata:#ff9a8f; --ust:#fff;
   /* --ya / --ku: yapanın ve kullananın ön plan tonu (gecede açık, gündüzde koyu ton okunur) */
   --ya:var(--yapan2); --ku:var(--kullanan); --cam1:rgba(26,20,42,.7); --cam2:rgba(16,12,26,.7); --kuyu:rgba(0,0,0,.3);
-  --golge:0 1px 0 rgba(255,255,255,.06) inset,0 30px 60px -30px rgba(0,0,0,.8); --isik:.2; --kum:.22; --mor1:26%; --mor2:9%;
+  --golge:0 1px 0 rgba(255,255,255,.06) inset,0 30px 60px -30px rgba(0,0,0,.8); --isik:.2; --kum:.22; --mor1:26%; --mor2:9%; --modul:#0e0b18;
   --cizgi:color-mix(in srgb,var(--ya) 11%,transparent); --cizgi2:color-mix(in srgb,var(--ya) 20%,transparent);
   --f:"Plus Jakarta Sans","Segoe UI Variable Text","Segoe UI",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,Consolas,monospace; --yay:cubic-bezier(.2,.8,.2,1);
   position:fixed; inset:0; z-index:5; overflow:hidden; display:grid; grid-template-columns:var(--ray,296px) minmax(0,1fr); gap:12px; padding:12px;
@@ -26,7 +26,7 @@
   /* Gündüz (kullanıcı isteği 13.10.2026): aynı iskelet, açık cam. Yalnız tonlar değişir; kurallar aynı. */
   &.gunduz { --zemin:#f3f1fa; --yazi:#1d1736; --orta:#4f4869; --soluk:#857da3; --hata:#c23a2b; --ust:#130e26;
     --ya:var(--yapan); --ku:color-mix(in srgb,var(--kullanan2) 86%,#000); --cam1:rgba(255,255,255,.84); --cam2:rgba(255,255,255,.64); --kuyu:color-mix(in srgb,var(--yapan) 5%,#fff);
-    --golge:0 1px 0 #fff inset,0 30px 60px -36px rgba(76,29,149,.4); --isik:.1; --kum:.08; --mor1:12%; --mor2:30%; }
+    --golge:0 1px 0 #fff inset,0 30px 60px -36px rgba(76,29,149,.4); --isik:.1; --kum:.08; --mor1:12%; --mor2:30%; --modul:#f3f1fa; }
   /* Zemin: ince ızgara, kumlanma, ağır ağır gezen ışık (cam düz renk gibi durmasın) */
   &::before { content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
     background:linear-gradient(var(--cizgi) 1px,transparent 1px) 0 0/56px 56px,linear-gradient(90deg,var(--cizgi) 1px,transparent 1px) 0 0/56px 56px;
@@ -153,7 +153,7 @@
   #kb-taslak li .isk { height:9px; }
   #kb-taslak li .isk:first-child { width:28px; height:28px; border-radius:8px; flex:none; }
   #kb-taslak li .isk:last-child { margin-left:auto; width:64px; flex:none; }
-  #kb-cerceve { position:absolute; inset:0; width:100%; height:100%; border:0; background:#f3f4fb; opacity:0; pointer-events:none; transform:translateY(6px); transition:opacity .3s,transform .35s var(--yay); }
+  #kb-cerceve { position:absolute; inset:0; width:100%; height:100%; border:0; background:var(--modul); opacity:0; pointer-events:none; transform:translateY(6px); transition:opacity .3s,transform .35s var(--yay); }
   #kb-cerceve.var { opacity:1; pointer-events:auto; transform:none; }
   #kb-hata { position:absolute; inset:0; display:grid; place-items:center; padding:24px; text-align:center; color:var(--hata); overflow-wrap:anywhere; }
   #kb-hata:empty { display:none; }

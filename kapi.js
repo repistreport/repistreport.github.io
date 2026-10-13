@@ -15,6 +15,7 @@ const KOPRU_EXEC = 'https://script.google.com/macros/s/AKfycbz-HUdmwpaE2gnwK9pX2
 const YOL = String(window.REP_YOL || '');
 const MENU = new URLSearchParams(location.search).get('menu') || '';
 const HATIRLA = 'repkapi.eposta';
+const TEMA_ANAHTAR = 'repkabuk.tema'; // gece / gündüz seçimi (kabuk.js ile aynı anahtar); tek başına açılan modüle adresle gider
 
 const auth = getAuth(initializeApp(FIREBASE_AYAR));
 auth.languageCode = 'tr';
@@ -99,8 +100,10 @@ async function modulAc(user, y) {
       if (!/(^|\.)googleusercontent\.com$/.test(alan) || !e.data) return;
       if (e.data.rep === 'hazir') { clearTimeout(sure); goster2(); }
       if (e.data.rep === 'cikis') signOut(auth).then(() => location.reload());
+      if (e.data.rep === 'temaSec' && (e.data.tema === 'gece' || e.data.tema === 'gunduz')) try { localStorage.setItem(TEMA_ANAHTAR, e.data.tema); } catch (x) {}
     });
-    c.src = r.adres; document.body.append(c);
+    let tema = 'gunduz'; try { if (localStorage.getItem(TEMA_ANAHTAR) === 'gece') tema = 'gece'; } catch (x) {}
+    c.src = r.adres + (r.adres.includes('?') ? '&' : '?') + 'tema=' + tema; document.body.append(c);
     document.title = 'REP İstanbul · ' + r.ad;
   } catch (e) { goster('secim'); $('uygulamalar').replaceChildren(); basliklar('GİRİŞ YAPILDI', 'Devam edilemedi.', user.email); durum(e.message, true); }
 }
@@ -109,7 +112,7 @@ async function modulAc(user, y) {
 // (ağaç menü, arama, modül sahnesi, yükleme göstergeleri); burası yalnız kimliği ve köprüyü verir.
 async function kabukAc(user, y) {
   try {
-    const { kabukAc: kur } = await import('./kabuk.js?s=2');
+    const { kabukAc: kur } = await import('./kabuk.js?s=3');
     await kur({
       yol: y, ilk: MENU.replace(/[^A-Za-z0-9_æ-]/g, ''),
       iste: async (govde) => kopru({ ...govde, idToken: await user.getIdToken(), yol: y.id }),
