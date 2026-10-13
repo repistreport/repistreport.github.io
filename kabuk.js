@@ -14,7 +14,8 @@ const IKON = {
   ayar: 'M12 9a3 3 0 100 6 3 3 0 000-6zM12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1',
   arti: 'M12 5v14M5 12h14', deney: 'M9 3h6M10 3v6l-5 10h14l-5-10V3', dal: 'M4 7h6l2 2h8v10H4z', yaprak: 'M5 5h14v14H5zM9 10h6M9 14h4',
   ok: 'M9 6l6 6-6 6', ray: 'M4 5h16v14H4zM9.5 5v14', cikis: 'M14 4h5v16h-5M10 8l-4 4 4 4M6 12h9', ara: 'M11 4.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM16 16l4.5 4.5',
-  yenile: 'M19 12a7 7 0 11-2.1-5M19 4v4h-4', tam: 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5'
+  yenile: 'M19 12a7 7 0 11-2.1-5M19 4v4h-4', tam: 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5',
+  gunduz: 'M12 8a4 4 0 100 8 4 4 0 000-8zM12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4', gece: 'M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z'
 };
 const svg = (ad, sinif) => '<svg' + (sinif ? ' class="' + sinif + '"' : '') + ' viewBox="0 0 24 24" aria-hidden="true"><path d="' + IKON[ad] + '"/></svg>';
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -23,7 +24,7 @@ const bekle = (ms) => new Promise(r => setTimeout(r, ms));
 
 function stil() {
   return new Promise((bitti) => {
-    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=1', import.meta.url).href;
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=2', import.meta.url).href;
     l.onload = l.onerror = bitti; document.head.append(l);
   });
 }
@@ -42,7 +43,7 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
         '<button type="button" class="dugme" id="kb-cikis" title="Çıkış">' + svg('cikis') + '</button></div>' +
     '</aside>' +
     '<main id="kb-govde">' +
-      '<header id="kb-ust" class="cam"><label id="kb-ara" title="Basamak ara">' + svg('ara') + '<input id="kb-sorgu" placeholder="Ara" autocomplete="off" spellcheck="false"><kbd>Ctrl K</kbd></label><div id="kb-piller"></div></header>' +
+      '<header id="kb-ust" class="cam"><label id="kb-ara" title="Basamak ara">' + svg('ara') + '<input id="kb-sorgu" placeholder="Ara" autocomplete="off" spellcheck="false"><kbd>Ctrl K</kbd></label><div id="kb-piller"></div><button type="button" class="dugme" id="kb-tema"></button></header>' +
       '<section id="kb-sahne" class="cam">' +
         '<div id="kb-bos"><b>rep<i>.</i></b></div>' +
         '<div id="kb-bas" hidden><div><div id="kb-iz"></div><h1 id="kb-baslik"></h1></div><span class="etiket" id="kb-hal" role="status" aria-live="polite"></span><span class="etiket" id="kb-kod" title="Modül"></span>' +
@@ -57,6 +58,16 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
   $('yol').textContent = yol.ad;
   document.body.append(k); document.title = 'REP İstanbul · ' + yol.ad;
   if (matchMedia('(max-width:860px)').matches) k.classList.add('dar');
+
+  // Gece / gündüz (kullanıcı isteği 13.10.2026): seçim bu tarayıcıda hatırlanır; ilk açılış gece
+  const TEMA_ANAHTAR = 'repkabuk.tema';
+  const temaYaz = (gunduz) => {
+    k.classList.toggle('gunduz', gunduz);
+    $('tema').innerHTML = svg(gunduz ? 'gece' : 'gunduz'); $('tema').title = gunduz ? 'Geceye geç' : 'Gündüze geç'; $('tema').setAttribute('aria-pressed', gunduz);
+  };
+  let gunduz = false; try { gunduz = localStorage.getItem(TEMA_ANAHTAR) === 'gunduz'; } catch (e) {}
+  temaYaz(gunduz);
+  $('tema').addEventListener('click', () => { gunduz = !gunduz; temaYaz(gunduz); try { localStorage.setItem(TEMA_ANAHTAR, gunduz ? 'gunduz' : 'gece'); } catch (e) {} });
 
   // Süzgeç pilleri: hepsi seçili gelir, eşit pil
   const d = { hazir: false, menu: [], secili: '', yuk: '', acik: new Set(), sorgu: '', pil: new Set(['canli', 'bekleyen']), no: 0, t0: 0, sure: 0 };
