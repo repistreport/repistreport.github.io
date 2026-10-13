@@ -105,68 +105,18 @@ async function modulAc(user, y) {
   } catch (e) { goster('secim'); $('uygulamalar').replaceChildren(); basliklar('GİRİŞ YAPILDI', 'Devam edilemedi.', user.email); durum(e.message, true); }
 }
 
-// --- Kabuk (kullanıcı kararı 03.10.2026): hedef adresi olmayan yol menüyle açılır. Menü köprüden (Rep_Menu), her basamak kendi başına çalışan
-// bir modülü çerçevede açar; köprü açılışta tek kullanımlık bilet verir. Modül menüyü değiştirince ({ rep: 'menuYenile' }) menü yeniden okunur.
-let kabuk = null;
-async function kabukMenu(tazele) {
-  const r = await kopru({ islem: 'menu', idToken: await kabuk.user.getIdToken(), yol: kabuk.yol.id, tazele: tazele === true });
-  kabuk.menu = r.menu;
-  $('kb-kisi').textContent = r.ad || kabuk.user.email;
-  const derinlik = (m, n = 0) => { const u = r.menu.find(x => x.id === m.ust); return u && n < 6 ? derinlik(u, n + 1) : n; };
-  // Alt basamak üstünün hemen altında dursun: köprünün sırası korunur, çocuklar ebeveynin ardına dizilir
-  const sirali = [], ekle = (ust) => r.menu.filter(m => (m.ust || '') === ust).forEach(m => { sirali.push(m); ekle(m.id); });
-  ekle(''); r.menu.forEach(m => { if (!sirali.includes(m)) sirali.push(m); });
-  $('kb-liste').replaceChildren(...sirali.map(m => {
-    const b = document.createElement('button'); b.type = 'button'; b.className = 'kb-basamak'; b.dataset.id = m.id; b.disabled = !m.acik;
-    b.style.paddingLeft = (16 + derinlik(m) * 16) + 'px'; b.textContent = m.ad; b.title = m.acik ? m.ad : m.ad + ' (henüz bir modüle bağlı değil)';
-    if (m.id === kabuk.secili) b.classList.add('secili');
-    if (m.acik) b.addEventListener('click', () => kabukBasamak(m.id));
-    return b;
-  }));
-  $('kb-bos').textContent = r.menu.length ? 'Menüden bir basamak seçin.' : 'Bu uygulamanın menüsünde henüz basamak yok.';
-}
-// Bekleme göstergesi (kullanıcı isteği 03.10.2026: 'çalışıyor mu çalışmıyor mu anlaşılmıyor'): modül açılırken ortada dönen işaret ve yazı
-function kabukBekle(yazi) {
-  const b = $('kb-bekle');
-  b.hidden = !yazi; $('kb-bekle-yazi').textContent = yazi || '';
-  if (!yazi) clearTimeout(kabuk.bekleSure);
-}
-async function kabukBasamak(id) {
-  const m = (kabuk.menu || []).find(x => x.id === id);
-  if (!m || !m.acik) return;
-  kabuk.secili = id;
-  document.querySelectorAll('.kb-basamak').forEach(b => b.classList.toggle('secili', b.dataset.id === id));
-  $('kb-durum').textContent = ''; $('kb-durum').classList.remove('hata');
-  kabukBekle(m.ad + ' açılıyor');
-  try {
-    const r = await kopru({ islem: 'menuAc', idToken: await kabuk.user.getIdToken(), yol: kabuk.yol.id, menu: id });
-    if (kabuk.secili !== id) return; // bu arada başka basamak seçildi
-    const c = $('kb-cerceve'); c.title = r.ad; c.src = r.adres; c.hidden = false; $('kb-bos').hidden = true;
-    document.title = 'REP İstanbul · ' + r.ad;
-    // Bekleme göstergesi modül 'hazır' deyince kalkar ({ rep: 'hazir' }); demezse 90 sn sonra kalkar
-    clearTimeout(kabuk.bekleSure); kabuk.bekleSure = setTimeout(() => kabukBekle(''), 90000);
-  } catch (e) { kabukBekle(''); $('kb-durum').textContent = e.message; $('kb-durum').classList.add('hata'); }
-}
+// --- Kabuk (kullanıcı kararı 03.10.2026; cam kokpit 13.10.2026): hedef adresi olmayan yol menüyle açılır. Kabuğun kendisi kabuk.js'te
+// (ağaç menü, arama, modül sahnesi, yükleme göstergeleri); burası yalnız kimliği ve köprüyü verir.
 async function kabukAc(user, y) {
-  kabuk = { user, yol: y, menu: [], secili: '' };
-  const k = document.createElement('div'); k.id = 'kabuk';
-  k.innerHTML = '<aside class="kb-menu"><div class="kb-marka">rep<i>.</i><small></small></div><nav id="kb-liste" aria-label="Menü"></nav>' +
-    '<div class="kb-alt"><span id="kb-kisi"></span><button type="button" class="metin-dugme" id="kb-cikis">Çıkış</button></div></aside>' +
-    '<main class="kb-govde"><div id="kb-durum" role="status" aria-live="polite"></div><div id="kb-bos">Menü okunuyor…</div>' +
-    '<div id="kb-bekle" role="status" aria-live="polite" hidden><span class="kb-doner"></span><span id="kb-bekle-yazi"></span></div>' +
-    '<iframe id="kb-cerceve" hidden credentialless allow="clipboard-read; clipboard-write; fullscreen"></iframe></main>';
-  k.querySelector('.kb-marka small').textContent = y.ad;
-  document.body.append(k); $('kapi').hidden = true; document.title = 'REP İstanbul · ' + y.ad;
-  $('kb-cikis').addEventListener('click', () => { signOut(auth); location.reload(); });
-  // Modülden gelen haber: yalnız Google'ın uygulama çerçevesinden ve yalnız "menüyü yenile"
-  window.addEventListener('message', (e) => {
-    let alan = ''; try { alan = new URL(e.origin).hostname; } catch (x) {}
-    if (!/(^|\.)googleusercontent\.com$/.test(alan) || !e.data) return;
-    if (e.data.rep === 'menuYenile') kabukMenu(true).catch(() => {});
-    if (e.data.rep === 'hazir') kabukBekle('');
-  });
-  try { await kabukMenu(); const m = MENU.replace(/[^A-Za-z0-9_æ-]/g, ''); if (m) kabukBasamak(m); }
-  catch (e) { $('kb-bos').textContent = ''; $('kb-durum').textContent = e.message; $('kb-durum').classList.add('hata'); }
+  try {
+    const { kabukAc: kur } = await import('./kabuk.js?s=1');
+    await kur({
+      yol: y, ilk: MENU.replace(/[^A-Za-z0-9_æ-]/g, ''),
+      iste: async (govde) => kopru({ ...govde, idToken: await user.getIdToken(), yol: y.id }),
+      cikis: () => signOut(auth).then(() => location.reload())
+    });
+    $('kapi').hidden = true;
+  } catch (e) { goster('secim'); durum(e.message, true); }
 }
 
 // Oturum değişince: onaylanmamış e-posta hesabı içeri alınmaz
