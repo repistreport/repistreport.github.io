@@ -77,6 +77,9 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
   const cocuklar = (ust) => d.menu.filter(m => m.ust === ust);
   const yaprak = (m) => !cocuklar(m.id).length;
   const yapraklar = (m) => yaprak(m) ? [m] : cocuklar(m.id).flatMap(yapraklar);
+  // Modül rozeti (kullanıcı isteği 14.10.2026): altındaki bütün basamaklar tek modülse rozet yalnız en üstteki o dalda görünür, altlarda tekrar etmez
+  const tekModul = (m) => { const s = new Set(yapraklar(m).map(x => x.modul || '')); return s.size === 1 ? [...s][0] : ''; };
+  const rozet = (m) => { const t = tekModul(m), u = t && d.menu.find(x => x.id === m.ust); return t && !(u && tekModul(u) === t) ? t : ''; };
   const ustler = (m) => { const y = []; for (let u = d.menu.find(x => x.id === m.ust), n = 0; u && n < 8; u = d.menu.find(x => x.id === u.ust), n++) y.unshift(u); return y; };
   const hal = (m) => m.acik ? 'canli' : 'bekleyen';
   const ikon = (m, y) => IKON[m.ikon] ? svg(m.ikon) : m.ikon ? '<span class="im">' + esc(m.ikon) + '</span>' : svg(y ? 'yaprak' : 'dal');
@@ -106,7 +109,7 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
       return '<div class="dugum' + (y ? ' yaprak' : '') + (acik ? ' acik' : '') + (yol2.has(m.id) ? ' yol' : '') + '" role="treeitem"' + (y ? '' : ' aria-expanded="' + acik + '"') + '>' +
         '<button type="button" class="satir' + (y ? (m.acik ? ' canli' : ' kapali') : '') + (m.id === d.secili ? ' secili' : '') + (m.id === d.yuk ? ' yuk' : '') + '" data-id="' + esc(m.id) + '" title="' + esc(ipucu) + '">' +
         ikon(m, y) + '<span class="ad">' + vurgu(m.ad) + '</span>' +
-        (y ? (m.modul ? '<span class="kod">' + esc(m.modul) + '</span>' : '') + '<i class="isik"></i>' : '<span class="sayi">' + canli + '</span>' + svg('ok', 'ok')) + '</button>' +
+        (rozet(m) ? '<span class="kod">' + esc(rozet(m)) + '</span>' : '') + (y ? '<i class="isik"></i>' : '<span class="sayi">' + canli + '</span>' + svg('ok', 'ok')) + '</button>' +
         (y ? '' : '<div class="cocuk"><div>' + dal(m.id) + '</div></div>') + '</div>';
     }).join('');
     $('agac').innerHTML = dal('') || '<div class="kb-yok">' + (d.menu.length ? 'Sonuç yok' : 'Menüde basamak yok') + '</div>';
