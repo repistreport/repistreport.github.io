@@ -3,7 +3,7 @@
 // Açılışta hiçbir basamak seçili değil, hiçbir dal açık değil. kapi.js çağırır: kabukAc({ yol, iste, cikis, ilk }).
 
 // Renkler: yapan = yazılımı yapan (Abrama: mor, lila) · kullanan = yazılımı kullanan sistem (Rep: turuncu, fosforlu turuncu).
-// Başka sistemde yalnız "kullanan" değişir. Şimdilik burada tek yerde; sistem tablosuna taşınacak (12_KararVerilecek).
+// Kaynak köprü (14.10.2026; Rep_Sistem, yoksa köprünün varsayılanı): menü cevabındaki renk uygulanır. Buradaki değerler yalnız menü gelene kadarki ilk boyama.
 const TEMA = { yapan: '#7c3aed', yapan2: '#c4b5fd', kullanan: '#ff8a3d', kullanan2: '#ff5f00' };
 
 // Rep_Menu.IDU_Ikon bu adlardan biriyse çizim, başka bir şeyse (emoji) olduğu gibi gösterilir; boşsa dal / yaprak çizimi
@@ -24,7 +24,7 @@ const bekle = (ms) => new Promise(r => setTimeout(r, ms));
 
 function stil() {
   return new Promise((bitti) => {
-    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=5', import.meta.url).href;
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=6', import.meta.url).href;
     l.onload = l.onerror = bitti; document.head.append(l);
   });
 }
@@ -125,6 +125,7 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
       const kimlik = new Set(r.menu.map(m => m.id));
       d.menu = r.menu.map(m => ({ ...m, ust: kimlik.has(m.ust) && m.ust !== m.id ? m.ust : '' })); // üstü görünmeyen basamak köke düşer
       d.belgeler = r.belgeler || [];
+      Object.entries(r.renk || {}).forEach(([ad, v]) => { if (/^#[0-9a-f]{6}$/i.test(v)) k.style.setProperty('--' + ad, v); });
       const ad = r.ad || ''; $('kisi').textContent = ad; $('kisa').textContent = ad.split(/\s+/).map(s => s[0] || '').slice(0, 2).join('').toLocaleUpperCase('tr');
       d.hazir = true; ciz();
       $('bag').className = 'var'; $('bag').lastElementChild.textContent = 'Köprü bağlı';
