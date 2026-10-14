@@ -24,7 +24,7 @@ const bekle = (ms) => new Promise(r => setTimeout(r, ms));
 
 function stil() {
   return new Promise((bitti) => {
-    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=6', import.meta.url).href;
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=7', import.meta.url).href;
     l.onload = l.onerror = bitti; document.head.append(l);
   });
 }
@@ -120,8 +120,10 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
   }
 
   async function menuOku(tazele) {
+    const no = d.menuNo = (d.menuNo || 0) + 1;
     try {
       const r = await iste({ islem: 'menu', tazele: tazele === true });
+      if (no !== d.menuNo) return; // bu arada yeni okuma başladı; eski cevap yenisinin üstüne yazmasın
       const kimlik = new Set(r.menu.map(m => m.id));
       d.menu = r.menu.map(m => ({ ...m, ust: kimlik.has(m.ust) && m.ust !== m.id ? m.ust : '' })); // üstü görünmeyen basamak köke düşer
       d.belgeler = r.belgeler || [];
@@ -211,7 +213,8 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
   addEventListener('message', (e) => {
     let alan = ''; try { alan = new URL(e.origin).hostname; } catch (x) {}
     if (!/(^|\.)googleusercontent\.com$/.test(alan) || !e.data) return;
-    if (e.data.rep === 'menuYenile') menuOku(true);
+    // Menü değişti (Modül Ekle): hemen ve 4 sn sonra bir daha okunur (14.10.2026: tablo yazımı ilk okumaya bazen yetişmiyordu)
+    if (e.data.rep === 'menuYenile') { menuOku(true); clearTimeout(d.yenileSure); d.yenileSure = setTimeout(() => menuOku(true), 4000); }
     if (e.data.rep === 'hazir') { modulPencere = e.source; temaYaz(k.classList.contains('gunduz')); bitir(d.no); }
   });
   const saat = () => { $('saat').textContent = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }); }; saat(); setInterval(saat, 15000);
