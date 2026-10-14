@@ -24,7 +24,7 @@ const bekle = (ms) => new Promise(r => setTimeout(r, ms));
 
 function stil() {
   return new Promise((bitti) => {
-    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=3', import.meta.url).href;
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=4', import.meta.url).href;
     l.onload = l.onerror = bitti; document.head.append(l);
   });
 }
