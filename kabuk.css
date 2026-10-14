@@ -137,6 +137,10 @@
   .etiket.yuk, .etiket.hata { font-family:var(--f); }
   .etiket.hata { color:var(--hata); border-color:color-mix(in srgb,var(--hata) 35%,transparent); }
   .etiket.canli { color:var(--ku); border-color:color-mix(in srgb,var(--ku) 32%,transparent); background:color-mix(in srgb,var(--ku) 9%,transparent); font-family:var(--f); font-weight:600; }
+  #kb-belgeler { display:flex; gap:6px; }
+  .etiket.belge { cursor:pointer; background:none; font-family:var(--f); transition:color .15s,border-color .15s; }
+  .etiket.belge:hover { color:var(--yazi); border-color:var(--yapan2); }
+  .etiket.belge.secili { color:var(--ku); border-color:color-mix(in srgb,var(--ku) 45%,transparent); }
   .etiket.canli i { width:6px; height:6px; border-radius:50%; background:var(--kullanan2); animation:kb-nabiz 2.4s ease-out infinite; }
   /* İlerleme çizgisi: adım adım dolar (bilet, modül), bitince söner; ucunda ışık */
   #kb-akis { position:absolute; left:0; bottom:-1px; height:2px; width:0; opacity:0; border-radius:2px; background:linear-gradient(90deg,transparent,var(--ku) 40%,var(--kullanan2)); transition:width .5s var(--yay),opacity .35s; }

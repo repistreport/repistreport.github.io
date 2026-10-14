@@ -24,7 +24,7 @@ const bekle = (ms) => new Promise(r => setTimeout(r, ms));
 
 function stil() {
   return new Promise((bitti) => {
-    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=4', import.meta.url).href;
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=5', import.meta.url).href;
     l.onload = l.onerror = bitti; document.head.append(l);
   });
 }
@@ -46,7 +46,7 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
       '<header id="kb-ust" class="cam"><label id="kb-ara" title="Basamak ara">' + svg('ara') + '<input id="kb-sorgu" placeholder="Ara" autocomplete="off" spellcheck="false"><kbd>Ctrl K</kbd></label><div id="kb-piller"></div><button type="button" class="dugme" id="kb-tema"></button></header>' +
       '<section id="kb-sahne" class="cam">' +
         '<div id="kb-bos"><b>rep<i>.</i></b></div>' +
-        '<div id="kb-bas" hidden><div><div id="kb-iz"></div><h1 id="kb-baslik"></h1></div><span class="etiket" id="kb-hal" role="status" aria-live="polite"></span><span class="etiket" id="kb-kod" title="Modül"></span>' +
+        '<div id="kb-bas" hidden><div><div id="kb-iz"></div><h1 id="kb-baslik"></h1></div><span class="etiket" id="kb-hal" role="status" aria-live="polite"></span><span class="etiket" id="kb-kod" title="Modül"></span><span id="kb-belgeler"></span>' +
           '<button type="button" class="dugme" id="kb-yenile" title="Yenile">' + svg('yenile') + '</button><button type="button" class="dugme" id="kb-tam" title="Tam ekran">' + svg('tam') + '</button><i id="kb-akis"></i></div>' +
         '<div id="kb-alan"><div id="kb-taslak"><div><i class="isk"></i><i class="isk"></i><i class="isk"></i><i class="isk"></i></div><ul>' +
           [34, 48, 28, 42, 36, 52, 30, 44].map(g => '<li><i class="isk"></i><i class="isk" style="width:' + g + '%"></i><i class="isk"></i></li>').join('') + '</ul></div>' +
@@ -73,7 +73,7 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
   $('tema').addEventListener('click', () => { gunduz = !gunduz; temaYaz(gunduz); try { localStorage.setItem(TEMA_ANAHTAR, gunduz ? 'gunduz' : 'gece'); } catch (e) {} });
 
   // Süzgeç pilleri: hepsi seçili gelir, eşit pil
-  const d = { hazir: false, menu: [], secili: '', yuk: '', acik: new Set(), sorgu: '', pil: new Set(['canli', 'bekleyen']), no: 0, t0: 0, sure: 0 };
+  const d = { hazir: false, menu: [], belgeler: [], belge: '', secili: '', yuk: '', acik: new Set(), sorgu: '', pil: new Set(['canli', 'bekleyen']), no: 0, t0: 0, sure: 0 };
   const cocuklar = (ust) => d.menu.filter(m => m.ust === ust);
   const yaprak = (m) => !cocuklar(m.id).length;
   const yapraklar = (m) => yaprak(m) ? [m] : cocuklar(m.id).flatMap(yapraklar);
@@ -124,6 +124,7 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
       const r = await iste({ islem: 'menu', tazele: tazele === true });
       const kimlik = new Set(r.menu.map(m => m.id));
       d.menu = r.menu.map(m => ({ ...m, ust: kimlik.has(m.ust) && m.ust !== m.id ? m.ust : '' })); // üstü görünmeyen basamak köke düşer
+      d.belgeler = r.belgeler || [];
       const ad = r.ad || ''; $('kisi').textContent = ad; $('kisa').textContent = ad.split(/\s+/).map(s => s[0] || '').slice(0, 2).join('').toLocaleUpperCase('tr');
       d.hazir = true; ciz();
       $('bag').className = 'var'; $('bag').lastElementChild.textContent = 'Köprü bağlı';
@@ -150,12 +151,16 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
     $('sure').textContent = ((performance.now() - d.t0) / 1000).toFixed(1).replace('.', ',') + ' sn';
     d.yuk = ''; ciz();
   }
-  async function yukle(m) {
+  // Belge düğmeleri (kullanıcı isteği 14.10.2026): açık modülün Kullanım Kılavuzu, Açıklama …; liste köprüden, metin modülde. Seçili belge vurgulu; yeniden tıklayınca modüle döner.
+  function belgeCiz(m) {
+    $('belgeler').innerHTML = m.modul ? d.belgeler.map(b => '<button type="button" class="etiket belge' + (d.belge === b.kod ? ' secili' : '') + '" data-belge="' + esc(b.kod) + '" title="' + esc(m.modul + ' · ' + b.ad) + '">' + esc(b.ad) + '</button>').join('') : '';
+  }
+  async function yukle(m, belge) {
     const no = ++d.no, a = $('akis');
-    d.secili = d.yuk = m.id; d.t0 = performance.now(); ustler(m).forEach(u => d.acik.add(u.id)); ciz();
+    d.secili = d.yuk = m.id; d.belge = belge || ''; d.t0 = performance.now(); ustler(m).forEach(u => d.acik.add(u.id)); ciz();
     $('bos').hidden = true; $('bas').hidden = false; $('hata').textContent = '';
     $('iz').innerHTML = [yol.ad, ...ustler(m).map(x => x.ad)].map(x => '<span>' + esc(x) + '</span>').join(svg('ok'));
-    $('baslik').textContent = m.ad; $('kod').textContent = m.modul || '';
+    $('baslik').textContent = m.ad + (belge ? ' · ' + (d.belgeler.find(b => b.kod === belge) || {}).ad : ''); $('kod').textContent = m.modul || ''; belgeCiz(m);
     $('sahne').classList.add('yuk'); $('cerceve').classList.remove('var');
     a.style.transition = 'none'; a.style.width = '0'; a.style.opacity = '1'; void a.offsetWidth; a.style.transition = '';
     halYaz('Bilet alınıyor'); a.style.width = '38%';
@@ -163,7 +168,7 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
       const r = await iste({ islem: 'menuAc', menu: m.id });
       if (no !== d.no) return; // bu arada başka basamak seçildi
       const c = $('cerceve'); c.title = r.ad; modulPencere = null;
-      c.src = r.adres + (r.adres.includes('?') ? '&' : '?') + 'tema=' + (k.classList.contains('gunduz') ? 'gunduz' : 'gece');
+      c.src = r.adres + (r.adres.includes('?') ? '&' : '?') + 'tema=' + (k.classList.contains('gunduz') ? 'gunduz' : 'gece') + (belge ? '&belge=' + encodeURIComponent(belge) : '');
       document.title = 'REP İstanbul · ' + r.ad;
       halYaz('Modül açılıyor'); a.style.width = '86%';
       // Modül "hazır" deyince biter ({ rep: 'hazir' }); demezse 90 sn sonra
@@ -198,7 +203,8 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
   addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('sorgu').focus(); $('sorgu').select(); } });
   $('daralt').addEventListener('click', () => k.classList.toggle('dar'));
   $('cikis').addEventListener('click', cikis);
-  $('yenile').addEventListener('click', () => { const m = d.menu.find(x => x.id === d.secili); if (m) yukle(m); });
+  $('yenile').addEventListener('click', () => { const m = d.menu.find(x => x.id === d.secili); if (m) yukle(m, d.belge); });
+  $('belgeler').addEventListener('click', (e) => { const b = e.target.closest('[data-belge]'), m = d.menu.find(x => x.id === d.secili); if (b && m) yukle(m, d.belge === b.dataset.belge ? '' : b.dataset.belge); });
   $('tam').addEventListener('click', () => document.fullscreenElement ? document.exitFullscreen() : $('sahne').requestFullscreen());
   // Modülden gelen haber: yalnız Google'ın uygulama çerçevesinden
   addEventListener('message', (e) => {
