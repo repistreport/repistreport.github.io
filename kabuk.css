@@ -15,7 +15,7 @@
   --golge:0 1px 0 rgba(255,255,255,.06) inset,0 30px 60px -30px rgba(0,0,0,.8); --isik:.2; --kum:.22; --mor1:26%; --mor2:9%; --modul:#0e0b18;
   --cizgi:color-mix(in srgb,var(--ya) 11%,transparent); --cizgi2:color-mix(in srgb,var(--ya) 20%,transparent);
   --f:"Plus Jakarta Sans","Segoe UI Variable Text","Segoe UI",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,Consolas,monospace; --yay:cubic-bezier(.2,.8,.2,1);
-  position:fixed; inset:0; z-index:5; overflow:hidden; display:grid; grid-template-columns:var(--ray,296px) minmax(0,1fr); gap:12px; padding:12px;
+  position:fixed; inset:0; z-index:5; overflow:hidden; display:grid; grid-template-columns:var(--ray,340px) minmax(0,1fr); gap:12px; padding:12px;
   color:var(--yazi); font:500 13.5px/1.45 var(--f); letter-spacing:-.005em; -webkit-font-smoothing:antialiased; transition:grid-template-columns .26s var(--yay);
   background:
     radial-gradient(900px 620px at 0% 0%,color-mix(in srgb,var(--yapan) var(--mor1),transparent),transparent 70%),
@@ -62,7 +62,7 @@
   .kb-marka .dugme { margin-left:auto; }
 
   #kb-agac { flex:1; overflow:auto; padding:10px 8px; scrollbar-width:thin; scrollbar-color:var(--cizgi2) transparent; }
-  .satir { width:100%; display:flex; align-items:center; gap:10px; height:36px; padding:0 10px; border-radius:9px; border:1px solid transparent; text-align:left; color:var(--orta); position:relative; transition:background .15s,color .15s,border-color .15s; outline:0; }
+  .satir { width:100%; display:flex; align-items:center; gap:8px; height:32px; padding:0 8px; font-size:12.5px; border-radius:9px; border:1px solid transparent; text-align:left; color:var(--orta); position:relative; transition:background .15s,color .15s,border-color .15s; outline:0; }
   .satir:hover { background:color-mix(in srgb,var(--ya) 7%,transparent); color:var(--yazi); }
   .satir:focus-visible { border-color:var(--cizgi2); color:var(--yazi); box-shadow:0 0 0 3px color-mix(in srgb,var(--yapan) 25%,transparent); }
   .satir > :first-child { color:var(--soluk); transition:color .15s; }
@@ -72,7 +72,7 @@
   .dugum:not(.yaprak) > .satir { color:var(--yazi); font-weight:600; }
   .satir .ok { width:13px; height:13px; color:var(--soluk); transition:transform .2s var(--yay); }
   .dugum.acik > .satir .ok { transform:rotate(90deg); }
-  .satir .sayi, .satir .kod { font:500 10.5px/1 var(--mono); color:var(--soluk); letter-spacing:.02em; }
+  .satir .sayi, .satir .kod { font:500 10px/1 var(--mono); color:var(--soluk); letter-spacing:.02em; }
   .satir .isik { width:6px; height:6px; border-radius:50%; flex:none; box-shadow:0 0 0 1px var(--soluk) inset; }
   .satir.canli .isik { background:var(--kullanan2); box-shadow:0 0 0 3px color-mix(in srgb,var(--kullanan2) 18%,transparent); }
   .satir.kapali { color:var(--soluk); cursor:default; }
@@ -83,9 +83,9 @@
   .satir.secili > :first-child, .satir.secili .kod { color:var(--ku); }
   .satir.secili::before { content:""; position:absolute; left:-1px; top:9px; bottom:9px; width:2px; border-radius:2px; background:var(--kullanan2); }
   .satir.yuk .isik { width:11px; height:11px; margin-right:-2.5px; background:none; box-shadow:none; border:1.5px solid color-mix(in srgb,var(--kullanan2) 24%,transparent); border-top-color:var(--kullanan2); animation:kb-don .7s linear infinite; }
-  .cocuk { display:grid; grid-template-rows:0fr; transition:grid-template-rows .24s var(--yay); margin-left:17px; }
+  .cocuk { display:grid; grid-template-rows:0fr; transition:grid-template-rows .24s var(--yay); margin-left:15px; }
   .dugum.acik > .cocuk { grid-template-rows:1fr; }
-  .cocuk > div { overflow:hidden; border-left:1px solid var(--cizgi2); padding:2px 0 2px 9px; }
+  .cocuk > div { overflow:hidden; border-left:1px solid var(--cizgi2); padding:2px 0 2px 6px; }
   .kb-yok { padding:28px 12px; text-align:center; color:var(--soluk); display:grid; gap:12px; justify-items:center; }
   .kb-yok.hata { color:var(--hata); }
   .kb-yok button { height:30px; padding:0 14px; border-radius:8px; border:1px solid var(--cizgi2); color:var(--yazi); }
