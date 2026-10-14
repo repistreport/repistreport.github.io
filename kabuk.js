@@ -24,7 +24,7 @@ const bekle = (ms) => new Promise(r => setTimeout(r, ms));
 
 function stil() {
   return new Promise((bitti) => {
-    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=7', import.meta.url).href;
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=8', import.meta.url).href;
     l.onload = l.onerror = bitti; document.head.append(l);
   });
 }
@@ -215,6 +215,8 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
     if (!/(^|\.)googleusercontent\.com$/.test(alan) || !e.data) return;
     // Menü değişti (Modül Ekle): hemen ve 4 sn sonra bir daha okunur (14.10.2026: tablo yazımı ilk okumaya bazen yetişmiyordu)
     if (e.data.rep === 'menuYenile') { menuOku(true); clearTimeout(d.yenileSure); d.yenileSure = setTimeout(() => menuOku(true), 4000); }
+    // Modül başka basamağına geçmek isterse ({ rep: 'basamak', sayfa }) aynı modülün o sayfalı basamağı açılır; menü, başlık ve yol satırı ona göre değişir (14.10.2026)
+    if (e.data.rep === 'basamak') { const su = d.menu.find(x => x.id === d.secili), h = su && d.menu.find(x => x.modul === su.modul && x.sayfa === e.data.sayfa && x.acik); if (h && h.id !== d.secili) yukle(h); }
     if (e.data.rep === 'hazir') { modulPencere = e.source; temaYaz(k.classList.contains('gunduz')); bitir(d.no); }
   });
   const saat = () => { $('saat').textContent = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }); }; saat(); setInterval(saat, 15000);
