@@ -13,7 +13,7 @@ const IKON = {
   belge: 'M7 3h7l4 4v14H7zM14 3v4h4M10 12h5M10 16h5', defter: 'M5 4h13v16H5zM9 4v16M12 9h3', kisi: 'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21c1-4 4-6 8-6s7 2 8 6',
   ayar: 'M12 9a3 3 0 100 6 3 3 0 000-6zM12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1',
   arti: 'M12 5v14M5 12h14', deney: 'M9 3h6M10 3v6l-5 10h14l-5-10V3', dal: 'M4 7h6l2 2h8v10H4z', yaprak: 'M5 5h14v14H5zM9 10h6M9 14h4',
-  ok: 'M9 6l6 6-6 6', ray: 'M4 5h16v14H4zM9.5 5v14', cikis: 'M14 4h5v16h-5M10 8l-4 4 4 4M6 12h9', ara: 'M11 4.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM16 16l4.5 4.5',
+  ok: 'M9 6l6 6-6 6', ray: 'M4 5h16v14H4zM9.5 5v14', menu: 'M4 7h16M4 12h16M4 17h16', cikis: 'M14 4h5v16h-5M10 8l-4 4 4 4M6 12h9', ara: 'M11 4.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM16 16l4.5 4.5',
   yenile: 'M19 12a7 7 0 11-2.1-5M19 4v4h-4', tam: 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5',
   gunduz: 'M12 8a4 4 0 100 8 4 4 0 000-8zM12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4', gece: 'M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z'
 };
@@ -24,7 +24,7 @@ const bekle = (ms) => new Promise(r => setTimeout(r, ms));
 
 function stil() {
   return new Promise((bitti) => {
-    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=8', import.meta.url).href;
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=9', import.meta.url).href;
     l.onload = l.onerror = bitti; document.head.append(l);
   });
 }
@@ -35,7 +35,7 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
   const k = document.createElement('div'); k.id = 'kabuk';
   Object.entries(TEMA).forEach(([ad, v]) => k.style.setProperty('--' + ad, v));
   k.innerHTML =
-    '<div id="kb-isik"></div>' +
+    '<div id="kb-isik"></div><div id="kb-perde"></div>' +
     '<aside id="kb-ray" class="cam">' +
       '<div class="kb-marka"><b>rep<i>.</i></b><small id="kb-yol"></small><button type="button" class="dugme" id="kb-daralt" title="Menüyü daralt / genişlet">' + svg('ray') + '</button></div>' +
       '<nav id="kb-agac" aria-label="Menü" role="tree"></nav>' +
@@ -43,7 +43,7 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
         '<button type="button" class="dugme" id="kb-cikis" title="Çıkış">' + svg('cikis') + '</button></div>' +
     '</aside>' +
     '<main id="kb-govde">' +
-      '<header id="kb-ust" class="cam"><label id="kb-ara" title="Basamak ara">' + svg('ara') + '<input id="kb-sorgu" placeholder="Ara" autocomplete="off" spellcheck="false"><kbd>Ctrl K</kbd></label><div id="kb-piller"></div><button type="button" class="dugme" id="kb-tema"></button></header>' +
+      '<header id="kb-ust" class="cam"><button type="button" class="dugme" id="kb-menu" title="Menü">' + svg('menu') + '</button><label id="kb-ara" title="Basamak ara">' + svg('ara') + '<input id="kb-sorgu" placeholder="Ara" autocomplete="off" spellcheck="false"><kbd>Ctrl K</kbd></label><div id="kb-piller"></div><button type="button" class="dugme" id="kb-tema"></button></header>' +
       '<section id="kb-sahne" class="cam">' +
         '<div id="kb-bos"><b>rep<i>.</i></b></div>' +
         '<div id="kb-bas" hidden><div><div id="kb-iz"></div><h1 id="kb-baslik"></h1></div><span class="etiket" id="kb-hal" role="status" aria-live="polite"></span><span class="etiket" id="kb-kod" title="Modül"></span><span id="kb-belgeler"></span>' +
@@ -57,7 +57,10 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
   const $ = (id) => k.querySelector('#kb-' + id);
   $('yol').textContent = yol.ad;
   document.body.append(k); document.title = 'REP İstanbul · ' + yol.ad;
-  if (matchMedia('(max-width:860px)').matches) k.classList.add('dar');
+  // Telefon (kullanıcı isteği 17.10.2026): menü sahnenin üstüne açılan çekmece; açılışta hiçbir şey seçili olmadığı için açık gelir, basamak seçince kapanır.
+  const telefon = matchMedia('(max-width:640px)');
+  if (telefon.matches) k.classList.add('menu'); else if (matchMedia('(max-width:860px)').matches) k.classList.add('dar');
+  telefon.addEventListener('change', () => { k.classList.remove('dar', 'menu'); });
 
   // Gece / gündüz (kullanıcı isteği 13.10.2026): seçim bu tarayıcıda hatırlanır; ilk açılış gece.
   // Modül de uyar: ilk ton adresle gider (&tema=…), sonraki değişiklik açık modüle haberle ({ rep: 'tema' }; modül tarafı F020.tema)
@@ -185,7 +188,7 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
   function ac(id) {
     const m = d.menu.find(x => x.id === id); if (!m) return;
     if (!yaprak(m)) { d.acik.has(id) ? d.acik.delete(id) : d.acik.add(id); ciz(); }
-    if (m.acik) yukle(m);
+    if (m.acik) { yukle(m); k.classList.remove('menu'); }
   }
 
   $('agac').addEventListener('click', (e) => { const b = e.target.closest('.satir'); if (b) ac(b.dataset.id); });
@@ -204,7 +207,9 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
     if (e.key === 'Enter') { const b = $('agac').querySelector('.satir.canli'); if (b && d.sorgu) ac(b.dataset.id); }
   });
   addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('sorgu').focus(); $('sorgu').select(); } });
-  $('daralt').addEventListener('click', () => k.classList.toggle('dar'));
+  $('daralt').addEventListener('click', () => telefon.matches ? k.classList.remove('menu') : k.classList.toggle('dar'));
+  $('menu').addEventListener('click', () => k.classList.add('menu'));
+  $('perde').addEventListener('click', () => k.classList.remove('menu'));
   $('cikis').addEventListener('click', cikis);
   $('yenile').addEventListener('click', () => { const m = d.menu.find(x => x.id === d.secili); if (m) yukle(m, d.belge); });
   $('belgeler').addEventListener('click', (e) => { const b = e.target.closest('[data-belge]'), m = d.menu.find(x => x.id === d.secili); if (b && m) yukle(m, d.belge === b.dataset.belge ? '' : b.dataset.belge); });

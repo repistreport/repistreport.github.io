@@ -171,4 +171,26 @@
   #kb-saat { margin-left:auto; }
 }
 @media (max-width:860px) { #kabuk { --ray:64px; } #kabuk .pil { width:auto; } #kabuk .pil span { display:none; } }
+#kabuk #kb-menu, #kabuk #kb-perde { display:none; }
+/* Telefon (17.10.2026): tek kolon; menü soldan açılan çekmece (#kabuk.menu), arkasında perde; sahne başlığı iki satıra iner */
+@media (max-width:640px) {
+  #kabuk { grid-template-columns:minmax(0,1fr); gap:8px; padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));
+    #kb-ray { position:fixed; z-index:30; top:8px; bottom:8px; left:8px; width:min(320px,calc(100vw - 48px)); transform:translateX(calc(-100% - 16px)); transition:transform .26s var(--yay); }
+    &.menu #kb-ray { transform:none; }
+    #kb-perde { display:block; position:fixed; inset:0; z-index:25; background:rgba(8,6,13,.55); opacity:0; pointer-events:none; transition:opacity .2s; }
+    &.menu #kb-perde { opacity:1; pointer-events:auto; }
+    #kb-menu { display:grid; flex:none; }
+    #kb-tema, #kb-piller { flex:none; }
+    .satir { height:40px; font-size:14px; }
+    #kb-govde { grid-template-columns:minmax(0,1fr); }
+    #kb-ust { height:52px; padding:0 8px; gap:6px; }
+    #kb-ara { flex:1 1 auto; min-width:0; }
+    #kb-ara kbd { display:none; }
+    #kb-bas { flex-wrap:wrap; gap:8px; padding:10px 12px; }
+    #kb-bas > div:first-child { flex-basis:100%; }
+    #kb-baslik { font-size:17px; }
+    #kb-belgeler { flex-wrap:wrap; }
+    #kb-sure { display:none; }
+  }
+}
 @media (prefers-reduced-motion:reduce) { #kabuk, #kabuk * { transition:none !important; animation:none !important; } }
