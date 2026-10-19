@@ -97,7 +97,6 @@ window.Rep = window.Rep || {};
       if (lab.cdx === null || k >= 1) { lab.cdx = c.dx; lab.cdy = c.dy; }
       else { lab.cdx += (c.dx - lab.cdx) * k; lab.cdy += (c.dy - lab.cdy) * k; }
       if (Math.abs(lab.cdx - c.dx) + Math.abs(lab.cdy - c.dy) > 0.4) settling = true;
-      if (pl.label.dataset.align !== c.align) pl.label.dataset.align = c.align;
       pl.btn.style.transform = 'translate3d(' + (p.x - LO.iconR) + 'px,' + (p.y - LO.iconR) + 'px,0)';
       pl.btn.style.opacity = (0.72 + 0.28 * p.depth).toFixed(3);
       pl.label.style.transform = 'translate3d(' + (p.x + lab.cdx) + 'px,' + (p.y + lab.cdy) + 'px,0)';
@@ -151,7 +150,7 @@ window.Rep = window.Rep || {};
   function frame(t) {
     var dt = last ? Math.min(0.05, (t - last) / 1000) : 0; last = t;
     var moved = motion.tick(dt);
-    if (moved || dirty) dirty = positionAll(Math.min(1, dt * 7));
+    if (moved || dirty) dirty = positionAll(Math.min(1, dt * 4));   // yön değişimi ~0,5 sn'de süzülür
     requestAnimationFrame(frame);
   }
 

@@ -71,7 +71,9 @@ window.Rep = window.Rep || {};
     return { x: L.cx + L.rx * c, y: L.cy + L.ry * s, nx: nx / nl, ny: ny / nl, depth: (s + 1) / 2 };
   }
 
-  var LABEL_OFFS = [0, 20, -20, 40, -40, 60, -60, 80, -80];
+  // Normalden sapma adayları, 5° adımla (ince adım + süreklilik puanı = etiket akar, sıçramaz)
+  var LABEL_OFFS = [0];
+  for (var so = 5; so <= 85; so += 5) LABEL_OFFS.push(so, -so);
 
   // Etiket: yörüngenin dışına doğru; ekrana sığan, hiçbir şeyi örtmeyen, normale en yakın aday.
   // Dönüş: { dx, dy, o, align } — gezegen merkezine göre kutu sol-üst ofseti.
@@ -81,21 +83,23 @@ window.Rep = window.Rep || {};
     for (var k = 0; k < LABEL_OFFS.length; k++) {
       var o = LABEL_OFFS[k], a = base + o * Math.PI / 180;
       var dx = Math.cos(a), dy = Math.sin(a), g = L.iconR + 8;
-      var x = p.x + dx * g + (dx > 0.3 ? 0 : dx < -0.3 ? -size.w : -size.w / 2);
-      var y = p.y + dy * g + (dy > 0.3 ? 0 : dy < -0.3 ? -size.h : -size.h / 2);
+      // Sürekli yerleşim (zıplamasın): kutunun merkezi d yönünde t kadar uzakta; t, kutunun gezegenin g yarıçaplı karesine
+      // değmediği en küçük uzaklık. Açıyla sürekli değişir (eşik yok) ve hiçbir açıda kendi gezegenine girmez.
+      var t = Math.min(Math.abs(dx) > 1e-6 ? (size.w / 2 + g) / Math.abs(dx) : Infinity, Math.abs(dy) > 1e-6 ? (size.h / 2 + g) / Math.abs(dy) : Infinity);
+      var x = p.x + dx * t - size.w / 2, y = p.y + dy * t - size.h / 2;
       var r0 = rect(x, y, size.w, size.h);
       var r = clampInto(r0, L.bounds);
       var lx = r.x + r.w / 2 - p.x, ly = r.y + r.h / 2 - p.y;
       var dot = (lx * p.nx + ly * p.ny) / (Math.hypot(lx, ly) || 1);
       var s = Math.abs(o) * 0.4 + overflow(r0, L.bounds) * 0.6 + overlap(r, own) * 60;
+      if (prevO != null) s += Math.abs(o - prevO) * 0.5;   // süreklilik: öncekine yakın aday tercih edilir
       if (dot < -0.05) s += 5000;            // merkeze bakan tarafa asla
       for (var j = 0; j < obstacles.length; j++) s += overlap(r, obstacles[j]) * 30;
-      var c = { dx: r.x - p.x, dy: r.y - p.y, o: o, s: s, rect: r,
-                align: dx > 0.3 ? 'left' : dx < -0.3 ? 'right' : 'center' };
+      var c = { dx: r.x - p.x, dy: r.y - p.y, o: o, s: s, rect: r };
       if (!best || s < best.s) best = c;
       if (o === prevO) prev = c;
     }
-    return prev && prev.s <= best.s + 6 ? prev : best;   // titremesin diye küçük eşik
+    return prev && prev.s <= best.s + 2 ? prev : best;   // titremesin diye küçük eşik
   }
 
   // Uydu sütunu: gezegenin yanında/üstünde/altında; ekran dışına taşmaz.
