@@ -21,7 +21,9 @@ Rep.logo = {
 
   // Logoyu kapsayıcıya bir kez yerleştirir.
   mount: function (el) {
-    el.innerHTML = this.svg + '<span class="logo-tag">' + this.tagline + '</span>';
+    // Işık, logonun arkasındaki bulanık kopyada; asıl logo filtresiz kalır (netlik bozulmaz)
+    var glow = this.svg.replace('class="logo-mark"', 'class="logo-glow" aria-hidden="true"').replace(' role="img" aria-label="Representer"', '');
+    el.innerHTML = '<span class="logo-isik">' + glow + '</span>' + this.svg + '<span class="logo-tag">' + this.tagline + '</span>';
   },
   // Genişliğe göre ölçek: sitedeki oran (logo 159px → yazı 10px, aralık 4.9px).
   size: function (el, w) {

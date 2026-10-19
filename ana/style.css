@@ -41,16 +41,17 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .orbit.faint { stroke: rgba(255, 255, 255, .045); }
 
 .logo { position: absolute; left: 0; top: 0; text-align: center; pointer-events: none; z-index: 1; }
-.logo-mark { display: block; width: 100%; height: auto; animation: breathe 6s ease-in-out infinite; }
-.logo-tag {
+.logo-mark { position: relative; display: block; width: 100%; height: auto; }
+.logo-isik { position: absolute; left: 0; top: 0; width: 100%; pointer-events: none; }
+.logo-glow { display: block; width: 100%; height: auto; filter: blur(7px) brightness(1.25); opacity: .9; animation: breathe 6s ease-in-out infinite; }.logo-tag {
   display: block; margin-top: calc(var(--tag-size) * .2);
   font-size: var(--tag-size); line-height: 1.2; letter-spacing: .49em; text-indent: .49em;
   font-weight: 600; color: #fff; white-space: nowrap;
 }
-/* Fosfor ışığı: yakın parlak hale + geniş yumuşak ışık; nefes alır */
+/* Fosfor ışığı: arkadaki bulanık kopya + geniş hale; nefes alır. Asıl logo keskin kalır */
 @keyframes breathe {
-  0%, 100% { filter: drop-shadow(0 0 2px rgba(255, 120, 30, .85)) drop-shadow(0 0 10px rgba(255, 94, 0, .55)) drop-shadow(0 0 28px rgba(255, 94, 0, .30)); }
-  50% { filter: drop-shadow(0 0 3px rgba(255, 140, 50, 1)) drop-shadow(0 0 16px rgba(255, 94, 0, .80)) drop-shadow(0 0 44px rgba(255, 94, 0, .45)); }
+  0%, 100% { opacity: .7; filter: blur(7px) brightness(1.2) drop-shadow(0 0 18px rgba(255, 94, 0, .45)); }
+  50% { opacity: 1; filter: blur(9px) brightness(1.45) drop-shadow(0 0 30px rgba(255, 94, 0, .7)); }
 }
 
 /* Gezegen */
@@ -136,7 +137,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .panel-nav button[aria-current] .dot { background: var(--accent); }
 
 @media (prefers-reduced-motion: reduce) {
-  .logo-mark { animation: none; filter: drop-shadow(0 0 2px rgba(255, 120, 30, .9)) drop-shadow(0 0 12px rgba(255, 94, 0, .65)) drop-shadow(0 0 34px rgba(255, 94, 0, .35)); }
+  .logo-glow { animation: none; filter: blur(8px) brightness(1.3) drop-shadow(0 0 24px rgba(255, 94, 0, .55)); }
   .stage, .sats li, .panel-inner, .panel-backdrop, .pg { transition: none; }
   .sats li, .sats[data-side="L"] li { transform: none; }
   .link { animation: none; stroke-dashoffset: 0; }
