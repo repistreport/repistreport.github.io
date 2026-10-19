@@ -43,15 +43,23 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .logo { position: absolute; left: 0; top: 0; text-align: center; pointer-events: none; z-index: 1; }
 .logo-mark { position: relative; display: block; width: 100%; height: auto; }
 .logo-isik { position: absolute; left: 0; top: 0; width: 100%; pointer-events: none; }
-.logo-glow { display: block; width: 100%; height: auto; filter: blur(7px) brightness(1.25); opacity: .9; animation: breathe 6s ease-in-out infinite; }.logo-tag {
+.logo-glow { display: block; width: 100%; height: auto; filter: blur(12px); opacity: .5; animation: breathe 6s ease-in-out infinite; }
+/* Geniş, sıcak ortam ışığı (kenarsız; zemin parçası değil) */
+.logo::before {
+  content: ""; position: absolute; left: 50%; top: 45%; width: 220%; height: 380%; transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side, rgba(255, 94, 0, .10), rgba(255, 94, 0, .04) 55%, transparent);
+  pointer-events: none; z-index: -1;
+}
+/* rpresenter.com'daki gibi: beyaz, kalın, logo genişliğinde */
+.logo-tag {
   display: block; margin-top: calc(var(--tag-size) * .2);
   font-size: var(--tag-size); line-height: 1.2; letter-spacing: .49em; text-indent: .49em;
   font-weight: 600; color: #fff; white-space: nowrap;
 }
-/* Fosfor ışığı: arkadaki bulanık kopya + geniş hale; nefes alır. Asıl logo keskin kalır */
+/* Fosfor: arkadaki bulanık kopya nefes alır; asıl logo filtresiz, keskin */
 @keyframes breathe {
-  0%, 100% { opacity: .7; filter: blur(7px) brightness(1.2) drop-shadow(0 0 18px rgba(255, 94, 0, .45)); }
-  50% { opacity: 1; filter: blur(9px) brightness(1.45) drop-shadow(0 0 30px rgba(255, 94, 0, .7)); }
+  0%, 100% { opacity: .4; }
+  50% { opacity: .7; }
 }
 
 /* Gezegen */
@@ -137,7 +145,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .panel-nav button[aria-current] .dot { background: var(--accent); }
 
 @media (prefers-reduced-motion: reduce) {
-  .logo-glow { animation: none; filter: blur(8px) brightness(1.3) drop-shadow(0 0 24px rgba(255, 94, 0, .55)); }
+  .logo-glow { animation: none; opacity: .55; }
   .stage, .sats li, .panel-inner, .panel-backdrop, .pg { transition: none; }
   .sats li, .sats[data-side="L"] li { transform: none; }
   .link { animation: none; stroke-dashoffset: 0; }
