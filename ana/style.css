@@ -40,7 +40,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .orbit { fill: none; stroke: var(--line); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .orbit.faint { stroke: rgba(255, 255, 255, .045); }
 
-.logo { position: absolute; left: 0; top: 0; text-align: center; pointer-events: none; z-index: 1; }
+.logo { position: absolute; left: 0; top: 0; display: block; text-align: center; pointer-events: none; z-index: 1; }
 .logo-mark { position: relative; display: block; width: 100%; height: auto; }
 .logo-isik { position: absolute; left: 0; top: 0; width: 100%; pointer-events: none; }
 .logo-glow { display: block; width: 100%; height: auto; filter: blur(12px); opacity: .5; animation: breathe 6s ease-in-out infinite; }
@@ -50,6 +50,18 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   background: radial-gradient(closest-side, rgba(255, 94, 0, .10), rgba(255, 94, 0, .04) 55%, transparent);
   pointer-events: none; z-index: -1;
 }
+/* Logo = giriş bağlantısı: fare üstünde ışık artar, altında ipucu; dokunmatikte ipucu yok, dokununca açılır */
+.logo.baglanti { pointer-events: auto; cursor: pointer; color: inherit; text-decoration: none; }
+.logo.baglanti:focus-visible { outline-offset: 10px; }
+.logo-ipucu {
+  position: absolute; left: 50%; top: 100%; margin-top: calc(var(--tag-size) * 1.6);
+  font-size: 10px; letter-spacing: .32em; text-indent: .32em; text-transform: uppercase; color: var(--accent); white-space: nowrap;
+  opacity: 0; transform: translate(-50%, -4px); transition: opacity .25s, transform .25s; pointer-events: none;
+}
+.logo.baglanti:hover .logo-ipucu, .logo.baglanti:focus-visible .logo-ipucu { opacity: 1; transform: translate(-50%, 0); }
+.logo.baglanti:hover .logo-isik, .logo.baglanti:focus-visible .logo-isik { filter: brightness(1.7); }
+.logo-isik { transition: filter .3s; }
+@media (hover: none) { .logo-ipucu { display: none; } }
 /* rpresenter.com'daki gibi: beyaz, kalın, logo genişliğinde */
 .logo-tag {
   display: block; margin-top: calc(var(--tag-size) * .2);

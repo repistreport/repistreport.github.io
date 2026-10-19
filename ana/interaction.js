@@ -139,6 +139,17 @@ window.Rep = window.Rep || {};
     return '<a class="top-btn top-link" href="' + l.href + '">' + l.name + '</a>';
   }).join('');
 
+  // Logo bağlantısı: tıklama / dokunma / Enter girişe götürür
+  var ll = cfg.logoLink, lg = document.getElementById('logo');
+  if (ll) {
+    lg.href = ll.href;
+    lg.setAttribute('aria-label', ll.ipucu + ' · ' + cfg.brand.name);
+    lg.classList.add('baglanti');
+    var ip = document.createElement('span');
+    ip.className = 'logo-ipucu'; ip.textContent = ll.ipucu; ip.setAttribute('aria-hidden', 'true');
+    lg.appendChild(ip);
+  }
+
   var bm = document.getElementById('btn-motion');
   function syncMotion() {
     var on = motion.userRunning;

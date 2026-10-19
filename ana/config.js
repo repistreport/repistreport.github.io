@@ -7,6 +7,8 @@ Rep.config = {
   motion: { degPerSec: 3.2, closeDelayMs: 420 },
   worksPlanetId: 'islerimiz',
   topLinks: [{ name: 'Giriş', href: '/giris' }],
+  // Ortadaki logo da girişe götürür (kullanıcı kararı 19.10.2026); ipucu yalnız fare üzerindeyken görünür
+  logoLink: { href: '/giris', ipucu: 'Giriş' },
   planets: [
     { id: 'fotograf', name: 'Fotoğraf', icon: 'camera',
       satellites: ['Reklam', 'Ürün', 'Moda', 'Yemek', 'Mimari'] },
