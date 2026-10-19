@@ -47,9 +47,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   font-size: var(--tag-size); line-height: 1.2; letter-spacing: .49em; text-indent: .49em;
   font-weight: 600; color: #fff; white-space: nowrap;
 }
+/* Fosfor ışığı: yakın parlak hale + geniş yumuşak ışık; nefes alır */
 @keyframes breathe {
-  0%, 100% { filter: drop-shadow(0 0 6px rgba(255, 94, 0, .10)); }
-  50% { filter: drop-shadow(0 0 22px rgba(255, 94, 0, .32)); }
+  0%, 100% { filter: drop-shadow(0 0 2px rgba(255, 120, 30, .85)) drop-shadow(0 0 10px rgba(255, 94, 0, .55)) drop-shadow(0 0 28px rgba(255, 94, 0, .30)); }
+  50% { filter: drop-shadow(0 0 3px rgba(255, 140, 50, 1)) drop-shadow(0 0 16px rgba(255, 94, 0, .80)) drop-shadow(0 0 44px rgba(255, 94, 0, .45)); }
 }
 
 /* Gezegen */
@@ -135,7 +136,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .panel-nav button[aria-current] .dot { background: var(--accent); }
 
 @media (prefers-reduced-motion: reduce) {
-  .logo-mark { animation: none; filter: drop-shadow(0 0 12px rgba(255, 94, 0, .18)); }
+  .logo-mark { animation: none; filter: drop-shadow(0 0 2px rgba(255, 120, 30, .9)) drop-shadow(0 0 12px rgba(255, 94, 0, .65)) drop-shadow(0 0 34px rgba(255, 94, 0, .35)); }
   .stage, .sats li, .panel-inner, .panel-backdrop, .pg { transition: none; }
   .sats li, .sats[data-side="L"] li { transform: none; }
   .link { animation: none; stroke-dashoffset: 0; }
