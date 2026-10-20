@@ -1,5 +1,5 @@
-/* Representer favicon döngüsü — 10 simge, her biri 30 sn: Çizilen halka → Kayıt → Diyafram → Ses dalgası → Işıltı → Oynat → Kıvılcım → Film şeridi → Yörünge → Glitch.
-   abrama.app › İç Sistemler › Favicon Evreni. Kaynak: Projects/040_Favicon/motor.js (node favicon.cjs dongu 30 representer).
+/* Representer favicon döngüsü — 10 simge, her biri 6 sn: Çizilen halka → Kayıt → Diyafram → Ses dalgası → Işıltı → Oynat → Kıvılcım → Film şeridi → Yörünge → Glitch.
+   abrama.app › İç Sistemler › Favicon Evreni. Kaynak: Projects/040_Favicon/motor.js (node favicon.cjs dongu 6 representer).
    Chrome GIF / SVG simge oynatmaz; simge 64×64 tuvale çizilip ~11 kare/sn yenilenir.
    Sekme arka plandayken tarayıcı yenilemeyi saniyede bire düşürür. Hareket azaltma tercihinde simge sabit kalır. */
 (function () {
@@ -8,7 +8,7 @@ function kutu(c, s, renk) { const r = s * .22; c.beginPath(); c.moveTo(r, 0); c.
 function yaprakCiz(c, x, y, boy, en, aci, dolgu, damar) { c.save(); c.translate(x, y); c.rotate(aci); c.beginPath(); c.moveTo(0, 0); c.bezierCurveTo(en, -boy * .3, en, -boy * .78, 0, -boy); c.bezierCurveTo(-en, -boy * .78, -en, -boy * .3, 0, 0); c.fillStyle = dolgu; c.fill(); if (damar) { c.beginPath(); c.moveTo(0, -boy * .08); c.lineTo(0, -boy * .86); c.strokeStyle = damar; c.lineWidth = boy * .06; c.lineCap = 'round'; c.stroke(); } c.restore(); }
 function kalpCiz(c, x, y, w) { c.beginPath(); c.moveTo(x, y + w * .32); c.bezierCurveTo(x - w * .62, y - w * .12, x - w * .3, y - w * .62, x, y - w * .26); c.bezierCurveTo(x + w * .3, y - w * .62, x + w * .62, y - w * .12, x, y + w * .32); c.fill(); }
 function rCiz(c, x, y, boy, renk, kalin) { const k = boy / 18.2, p = new Path2D('M53.6 33.6V15.4h5.5c1.8 0 3.1.4 4 1.2s1.4 1.9 1.4 3.4c0 2.4-1.2 4.2-3.7 5.2l6.1 8.5h-3.2L58.5 26h-2.4v7.7h-2.6Zm2.5-9.6h.8c3.3 0 4.9-1.3 4.9-3.8s-1.4-2.8-4.1-2.8h-1.6v6.7Z'); c.save(); c.translate(x, y); c.scale(k, k); c.translate(-59.6, -24.5); c.fillStyle = renk; c.fill(p); if (kalin) { c.lineJoin = 'round'; c.lineWidth = kalin; c.strokeStyle = renk; c.stroke(p); } c.restore(); }
-var SURE = 30, SIMGE = [
+var SURE = 6, SIMGE = [
   /* Çizilen halka */ function (c, t) {
     const O = '#ff5e00', e = Math.min(1, (t % 3.4) / 1.8), a = -Math.PI / 2; c.lineCap = 'round';
     c.strokeStyle = 'rgba(255,94,0,.22)'; c.lineWidth = 4.5; c.beginPath(); c.arc(32, 32, 24, 0, Math.PI * 2); c.stroke();
