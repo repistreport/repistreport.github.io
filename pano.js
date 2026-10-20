@@ -56,7 +56,9 @@ export function panoAc(el) {
   const d = { secili: 'onay', aralik: 1, para: 'USD' };
   el.classList.add('pn');
   el.innerHTML =
-    '<div class="pn-ust"><h2>Pano</h2><span class="pn-tarih">' + bugun.toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + '</span><span class="pn-ornek" title="Canlıda köprüden ve tablolardan gelecek">örnek veri</span></div>' +
+    '<div class="pn-ust"><h2>Pano</h2><span class="pn-tarih">' + bugun.toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + '</span></div>' +
+    // Prototip uyarısı (kullanıcı kararı 20.10.2026): pano canlıda örnek veriyle; bölümler gerçek veriye bağlandıkça kalkar
+    '<div class="pn-demo" role="note">' + ik('uyari') + '<b>Prototip</b><span>Bu panodaki rakamlar ve kayıtlar örnektir; gerçek verilere bağlandıkça değişecek.</span></div>' +
     '<div><div class="pn-bas"><h3>Piyasa</h3><small>güncellendi ' + V.saat + '</small></div><div class="pn-piyasa" data-pn="piyasa"></div></div>' +
     '<div class="pn-iki">' +
       '<div class="pn-kart"><div class="pn-bas"><h3>Serbest piyasa kuru</h3><div class="pn-pil" data-pn="para"></div><div class="pn-pil pn-sag" data-pn="aralik"></div></div><svg class="pn-g" data-pn="kur"></svg><div class="pn-ipucu" data-pn="kur-ip"></div></div>' +
