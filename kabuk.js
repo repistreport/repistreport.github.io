@@ -24,23 +24,22 @@ const bekle = (ms) => new Promise(r => setTimeout(r, ms));
 
 function stil() {
   return new Promise((bitti) => {
-    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=13', import.meta.url).href;
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=14', import.meta.url).href;
     l.onload = l.onerror = bitti; document.head.append(l);
   });
 }
 
-// Representer logosu (kullanıcı isteği 20.10.2026). Tek kaynak ana/logo.js (ana sayfadakiyle aynı SVG).
-// Boş sahne: logo + arkada nefes alan bulanık kopya · menü başı: yalnız logo (menü daralınca gizli)
-function logoKoy(el, marka) {
+// Menü başında Representer logosu (kullanıcı isteği 20.10.2026). Tek kaynak ana/logo.js (ana sayfadakiyle aynı SVG); menü daralınca gizli
+function logoKoy(marka) {
   const s = document.createElement('script'); s.src = new URL('ana/logo.js?s=6', import.meta.url).href;
-  s.onload = () => {
-    const L = window.Rep && window.Rep.logo; if (!L) return;
-    const sessiz = L.svg.replace(' role="img" aria-label="Representer"', ' aria-hidden="true"');
-    el.innerHTML = '<span class="isik" aria-hidden="true">' + sessiz + '</span>' + L.svg + '<span class="tag">' + L.tagline + '</span>';
-    el.classList.add('hazir');
-    marka.innerHTML = L.svg;
-  };
+  s.onload = () => { const L = window.Rep && window.Rep.logo; if (L) marka.innerHTML = L.svg; };
   document.head.append(s);
+}
+
+// Açılış panosu (kullanıcı isteği 20.10.2026): basamak seçilmeden önce sahnede; pano.js / pano.css. Basamak açılınca gizlenir.
+function panoKoy(el) {
+  const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('pano.css?s=1', import.meta.url).href; document.head.append(l);
+  import('./pano.js?s=1').then(m => m.panoAc(el)).catch(() => {});
 }
 
 // yol = { id, ad } · iste(govde) = köprü isteği (kimlik ve yol kapi.js'te eklenir) · cikis() · ilk = açılışta açılacak basamak (?menu=…; boşsa hiçbiri)
@@ -59,7 +58,7 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
     '<main id="kb-govde">' +
       '<header id="kb-ust" class="cam"><button type="button" class="dugme" id="kb-menu" title="Menü">' + svg('menu') + '</button><label id="kb-ara" title="Basamak ara">' + svg('ara') + '<input id="kb-sorgu" placeholder="Ara" autocomplete="off" spellcheck="false"><kbd>Ctrl K</kbd></label><div id="kb-piller"></div><button type="button" class="dugme" id="kb-tema"></button></header>' +
       '<section id="kb-sahne" class="cam">' +
-        '<div id="kb-bos"><div class="logo"></div></div>' +
+        '<div id="kb-bos"></div>' +
         '<div id="kb-bas" hidden><div><div id="kb-iz"></div><h1 id="kb-baslik"></h1></div><span class="etiket" id="kb-hal" role="status" aria-live="polite"></span><span class="etiket" id="kb-kod" title="Modül"></span><span id="kb-belgeler"></span>' +
           '<button type="button" class="dugme" id="kb-yenile" title="Yenile">' + svg('yenile') + '</button><button type="button" class="dugme" id="kb-tam" title="Tam ekran">' + svg('tam') + '</button><i id="kb-akis"></i></div>' +
         '<div id="kb-alan"><div id="kb-taslak"><div><i class="isk"></i><i class="isk"></i><i class="isk"></i><i class="isk"></i></div><ul>' +
@@ -70,7 +69,7 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
     '</main>';
   const $ = (id) => k.querySelector('#kb-' + id);
   $('yol').textContent = yol.ad;
-  logoKoy($('bos').firstChild, k.querySelector('.kb-logo'));
+  logoKoy(k.querySelector('.kb-logo')); panoKoy($('bos'));
   document.body.append(k); document.title = 'Representer · ' + yol.ad;
   // Telefon (kullanıcı isteği 17.10.2026): menü sahnenin üstüne açılan çekmece; açılışta hiçbir şey seçili olmadığı için açık gelir, basamak seçince kapanır.
   const telefon = matchMedia('(max-width:640px)');

@@ -124,18 +124,8 @@
   .pil[data-d="canli"].secili .isik { background:var(--kullanan2); box-shadow:0 0 0 3px color-mix(in srgb,var(--kullanan2) 18%,transparent); }
 
   #kb-sahne { min-height:0; overflow:hidden; display:grid; grid-template-rows:auto minmax(0,1fr); }
-  #kb-bos { position:absolute; inset:0; display:grid; place-items:center; pointer-events:none; }
-  /* Boş sahne: Representer logosu (ana/logo.js); alt yazı logo genişliğinde (bu yazı tipinde 8.4/159) */
-  #kb-bos .logo { position:relative; width:min(460px,58%); container-type:inline-size; text-align:center; opacity:0; transform:translateY(8px) scale(.98); transition:opacity .9s var(--yay),transform .9s var(--yay); }
-  #kb-bos .logo.hazir { opacity:1; transform:none; }
-  #kb-bos svg { display:block; width:100%; height:auto; stroke:none; position:relative; }
-  /* Işık yalnız gecede, ince (kullanıcı: gündüz kir gibi duruyordu, 20.10.2026) */
-  #kb-bos .isik { position:absolute; inset:0 0 auto; }
-  #kb-bos .isik svg { filter:blur(6px); opacity:.3; animation:kb-nefes 6s ease-in-out infinite; }
-  &.gunduz #kb-bos .isik { display:none; }
-  #kb-bos .tag { display:flex; justify-content:center; margin-top:1.6cqw; font:500 calc(100cqw * 8.4 / 159)/1.2 var(--f); letter-spacing:.49em; text-indent:.49em; white-space:nowrap; color:var(--soluk); }
-  @keyframes kb-nefes { 0%,100% { opacity:.2; } 50% { opacity:.4; } }
-  @media (prefers-reduced-motion:reduce) { #kb-bos .isik svg { animation:none; } }
+  /* Boş sahne: açılış panosu (pano.css) */
+  #kb-bos { position:absolute; inset:0; }
   #kb-bas { display:flex; align-items:center; gap:12px; padding:14px 16px 14px 22px; border-bottom:1px solid var(--cizgi); position:relative; }
   #kb-bas > div:first-child { flex:1; min-width:0; }
   #kb-iz { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--soluk); min-height:17px; }
