@@ -24,18 +24,21 @@ const bekle = (ms) => new Promise(r => setTimeout(r, ms));
 
 function stil() {
   return new Promise((bitti) => {
-    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=10', import.meta.url).href;
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=11', import.meta.url).href;
     l.onload = l.onerror = bitti; document.head.append(l);
   });
 }
 
-// Boş sahne: Representer logosu (kullanıcı isteği 20.10.2026). Tek kaynak ana/logo.js (ana sayfadakiyle aynı SVG); arkada nefes alan bulanık kopya
-function logoKoy(el) {
+// Representer logosu (kullanıcı isteği 20.10.2026). Tek kaynak ana/logo.js (ana sayfadakiyle aynı SVG).
+// Boş sahne: logo + arkada nefes alan bulanık kopya · menü başı: yalnız logo (menü daralınca gizli)
+function logoKoy(el, marka) {
   const s = document.createElement('script'); s.src = new URL('ana/logo.js?s=1', import.meta.url).href;
   s.onload = () => {
     const L = window.Rep && window.Rep.logo; if (!L) return;
-    el.innerHTML = '<span class="isik" aria-hidden="true">' + L.svg.replace(' role="img" aria-label="Representer"', '') + '</span>' + L.svg + '<span class="tag">' + L.tagline + '</span>';
+    const sessiz = L.svg.replace(' role="img" aria-label="Representer"', ' aria-hidden="true"');
+    el.innerHTML = '<span class="isik" aria-hidden="true">' + sessiz + '</span>' + L.svg + '<span class="tag">' + L.tagline + '</span>';
     el.classList.add('hazir');
+    marka.innerHTML = L.svg;
   };
   document.head.append(s);
 }
@@ -48,7 +51,7 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
   k.innerHTML =
     '<div id="kb-isik"></div><div id="kb-perde"></div>' +
     '<aside id="kb-ray" class="cam">' +
-      '<div class="kb-marka"><b>rep<i>.</i></b><small id="kb-yol"></small><button type="button" class="dugme" id="kb-daralt" title="Menüyü daralt / genişlet">' + svg('ray') + '</button></div>' +
+      '<div class="kb-marka"><span class="kb-logo"></span><small id="kb-yol"></small><button type="button" class="dugme" id="kb-daralt" title="Menüyü daralt / genişlet">' + svg('ray') + '</button></div>' +
       '<nav id="kb-agac" aria-label="Menü" role="tree"></nav>' +
       '<div class="kb-alt"><em id="kb-kisa"></em><div><span id="kb-kisi"></span><span class="imza" title="Yazılım: Abrama"><i>A</i>Abrama</span></div>' +
         '<button type="button" class="dugme" id="kb-cikis" title="Çıkış">' + svg('cikis') + '</button></div>' +
@@ -67,7 +70,7 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
     '</main>';
   const $ = (id) => k.querySelector('#kb-' + id);
   $('yol').textContent = yol.ad;
-  logoKoy($('bos').firstChild);
+  logoKoy($('bos').firstChild, k.querySelector('.kb-logo'));
   document.body.append(k); document.title = 'REP İstanbul · ' + yol.ad;
   // Telefon (kullanıcı isteği 17.10.2026): menü sahnenin üstüne açılan çekmece; açılışta hiçbir şey seçili olmadığı için açık gelir, basamak seçince kapanır.
   const telefon = matchMedia('(max-width:640px)');

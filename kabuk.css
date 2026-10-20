@@ -56,8 +56,8 @@
   /* Ray: ağaç menü */
   #kb-ray { display:flex; flex-direction:column; min-height:0; overflow:hidden; }
   .kb-marka { display:flex; align-items:center; gap:10px; height:60px; padding:0 14px 0 18px; border-bottom:1px solid var(--cizgi); }
-  .kb-marka b { font:700 25px/1 var(--f); letter-spacing:-.06em; }
-  .kb-marka b i, #kb-bos b i { font-style:normal; color:var(--kullanan2); }
+  .kb-marka .kb-logo { display:flex; flex:none; }
+  .kb-marka .kb-logo svg { width:118px; height:auto; stroke:none; }
   .kb-marka small { font:600 10px/1 var(--f); letter-spacing:.14em; text-transform:uppercase; color:var(--orta); padding:5px 8px; border-radius:6px; border:1px solid var(--cizgi2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .kb-marka .dugme { margin-left:auto; }
 
@@ -101,7 +101,7 @@
   .kb-alt .imza i { width:13px; height:13px; border-radius:4px; display:grid; place-items:center; font:700 8px/1 var(--f); font-style:normal; letter-spacing:0; color:#fff; background:linear-gradient(135deg,var(--yapan),var(--yapan2)); }
   &.dar .kb-marka { padding:0; justify-content:center; }
   &.dar .kb-marka .dugme { margin:0; }
-  &.dar :is(.kb-marka b, .kb-marka small, .ad, .ok, .sayi, .kod, .isik, .cocuk, .kb-alt div, .kb-alt .dugme, .isk-satir .isk:last-child, .kb-yok) { display:none; }
+  &.dar :is(.kb-marka .kb-logo,.kb-marka small, .ad, .ok, .sayi, .kod, .isik, .cocuk, .kb-alt div, .kb-alt .dugme, .isk-satir .isk:last-child, .kb-yok) { display:none; }
   &.dar :is(.satir, .isk-satir) { justify-content:center; padding:0; }
   &.dar .kb-alt { justify-content:center; padding:12px 0; }
 
