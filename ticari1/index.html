@@ -6,21 +6,23 @@
   <title>REP İstanbul</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/kapi.css?s=8">
+  <link rel="stylesheet" href="/kapi.css?s=9">
   <!-- rep-app.com kapısı: Firebase girişi (kapi.js), yetki köprüden. Yol bu sayfaya özel. -->
   <script>window.REP_YOL = 'ticari1';</script>
-  <script type="module" src="/kapi.js?s=11"></script>
+  <script src="/ana/logo.js?s=6" defer></script>
+  <script src="/kapi-logo.js?s=1" defer></script>
+  <script type="module" src="/kapi.js?s=12"></script>
 </head>
 <body>
   <div id="kapi">
     <aside class="marka">
-      <div class="ust"><span class="rep">rep<i>.</i></span><span class="sehir">İSTANBUL<br>FOTOĞRAF &amp; FİLM</span></div>
+      <div class="ust"><span class="rep" data-rep-logo></span><span class="sehir">İSTANBUL<br>FOTOĞRAF &amp; FİLM</span></div>
       <div><h1>Şirketin nabzı,<br><span>tek ekranda.</span></h1><p>Giriş yaptığında kaldığın yerden devam edersin:<br>süren indirmeler, bekleyen kararlar ve son hareketler kokpitte seni bekler.</p></div>
       <div class="alt"><span>REP İSTANBUL</span><span>rep-app.com</span></div>
     </aside>
     <main class="panel">
       <div class="kart" id="kart">
-        <div class="rep">rep<i>.</i><small>İSTANBUL</small></div>
+        <div class="rep" data-rep-logo><small>İSTANBUL</small></div>
         <p class="ust-baslik" id="ust-baslik">REP’E HOŞ GELDİNİZ</p>
         <h2 id="baslik">İşinize odaklanın.</h2>
         <p class="aciklama" id="aciklama">Hesabınızla giriş yapın.</p>

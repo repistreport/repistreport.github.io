@@ -24,7 +24,7 @@ const bekle = (ms) => new Promise(r => setTimeout(r, ms));
 
 function stil() {
   return new Promise((bitti) => {
-    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=11', import.meta.url).href;
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('kabuk.css?s=12', import.meta.url).href;
     l.onload = l.onerror = bitti; document.head.append(l);
   });
 }
@@ -32,7 +32,7 @@ function stil() {
 // Representer logosu (kullanıcı isteği 20.10.2026). Tek kaynak ana/logo.js (ana sayfadakiyle aynı SVG).
 // Boş sahne: logo + arkada nefes alan bulanık kopya · menü başı: yalnız logo (menü daralınca gizli)
 function logoKoy(el, marka) {
-  const s = document.createElement('script'); s.src = new URL('ana/logo.js?s=1', import.meta.url).href;
+  const s = document.createElement('script'); s.src = new URL('ana/logo.js?s=6', import.meta.url).href;
   s.onload = () => {
     const L = window.Rep && window.Rep.logo; if (!L) return;
     const sessiz = L.svg.replace(' role="img" aria-label="Representer"', ' aria-hidden="true"');
