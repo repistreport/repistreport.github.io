@@ -71,7 +71,7 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
   const $ = (id) => k.querySelector('#kb-' + id);
   $('yol').textContent = yol.ad;
   logoKoy($('bos').firstChild, k.querySelector('.kb-logo'));
-  document.body.append(k); document.title = 'REP İstanbul · ' + yol.ad;
+  document.body.append(k); document.title = 'Representer · ' + yol.ad;
   // Telefon (kullanıcı isteği 17.10.2026): menü sahnenin üstüne açılan çekmece; açılışta hiçbir şey seçili olmadığı için açık gelir, basamak seçince kapanır.
   const telefon = matchMedia('(max-width:640px)');
   if (telefon.matches) k.classList.add('menu'); else if (matchMedia('(max-width:860px)').matches) k.classList.add('dar');
@@ -190,7 +190,7 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
       if (no !== d.no) return; // bu arada başka basamak seçildi
       const c = $('cerceve'); c.title = r.ad; modulPencere = null;
       c.src = r.adres + (r.adres.includes('?') ? '&' : '?') + 'tema=' + (k.classList.contains('gunduz') ? 'gunduz' : 'gece') + (belge ? '&belge=' + encodeURIComponent(belge) : '');
-      document.title = 'REP İstanbul · ' + r.ad;
+      document.title = 'Representer · ' + r.ad;
       halYaz('Modül açılıyor'); a.style.width = '86%';
       // Modül "hazır" deyince biter ({ rep: 'hazir' }); demezse 90 sn sonra
       clearTimeout(d.sure); d.sure = setTimeout(() => bitir(no), 90000);

@@ -82,7 +82,7 @@ function ac(user, y) {
   c.id = 'uygulama-cercevesi'; c.title = y.ad; c.setAttribute('credentialless', ''); c.allow = 'clipboard-read; clipboard-write; fullscreen';
   c.src = y.adres + (m ? '&menu=' + encodeURIComponent(m) : '');
   document.body.append(c); $('kapi').hidden = true;
-  document.title = 'REP İstanbul · ' + y.ad;
+  document.title = 'Representer · ' + y.ad;
 }
 
 // --- Modül yolu (kullanıcı kararı 04.10.2026): modül kendi başına yaşar. rep-app.com/<yol> adresinde giriş yapılır; köprü projeye bağlı tek kullanımlık
@@ -104,7 +104,7 @@ async function modulAc(user, y) {
     });
     let tema = 'gunduz'; try { if (localStorage.getItem(TEMA_ANAHTAR) === 'gece') tema = 'gece'; } catch (x) {}
     c.src = r.adres + (r.adres.includes('?') ? '&' : '?') + 'tema=' + tema; document.body.append(c);
-    document.title = 'REP İstanbul · ' + r.ad;
+    document.title = 'Representer · ' + r.ad;
   } catch (e) { goster('secim'); $('uygulamalar').replaceChildren(); basliklar('GİRİŞ YAPILDI', 'Devam edilemedi.', user.email); durum(e.message, true); }
 }
 
@@ -112,7 +112,7 @@ async function modulAc(user, y) {
 // (ağaç menü, arama, modül sahnesi, yükleme göstergeleri); burası yalnız kimliği ve köprüyü verir.
 async function kabukAc(user, y) {
   try {
-    const { kabukAc: kur } = await import('./kabuk.js?s=12');
+    const { kabukAc: kur } = await import('./kabuk.js?s=13');
     await kur({
       yol: y, ilk: MENU.replace(/[^A-Za-z0-9_æ-]/g, ''),
       iste: async (govde) => kopru({ ...govde, idToken: await user.getIdToken(), yol: y.id }),
@@ -125,7 +125,7 @@ async function kabukAc(user, y) {
 // Oturum değişince: onaylanmamış e-posta hesabı içeri alınmaz
 onAuthStateChanged(auth, (user) => {
   mesgul(false);
-  if (!user) { goster('giris'); basliklar('REP’E HOŞ GELDİNİZ', 'İşinize odaklanın.', 'Hesabınızla giriş yapın.'); durum(''); return; }
+  if (!user) { goster('giris'); basliklar('HOŞ GELDİNİZ', 'İşinize odaklanın.', 'Hesabınızla giriş yapın.'); durum(''); return; }
   const sifreli = user.providerData.some(p => p.providerId === 'password');
   if (sifreli && !user.emailVerified) {
     goster('onay'); basliklar('E-POSTA ONAYI', 'Gelen kutunuza bakın.', user.email);
