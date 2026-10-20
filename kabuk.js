@@ -38,8 +38,8 @@ function logoKoy(marka) {
 
 // Açılış panosu (kullanıcı isteği 20.10.2026): basamak seçilmeden önce sahnede; pano.js / pano.css. Basamak açılınca gizlenir.
 function panoKoy(el) {
-  const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('pano.css?s=2', import.meta.url).href; document.head.append(l);
-  import('./pano.js?s=2').then(m => m.panoAc(el)).catch(() => {});
+  const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = new URL('pano.css?s=3', import.meta.url).href; document.head.append(l);
+  import('./pano.js?s=3').then(m => m.panoAc(el)).catch(() => {});
 }
 
 // yol = { id, ad } · iste(govde) = köprü isteği (kimlik ve yol kapi.js'te eklenir) · cikis() · ilk = açılışta açılacak basamak (?menu=…; boşsa hiçbiri)

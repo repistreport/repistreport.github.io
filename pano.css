@@ -12,6 +12,9 @@
 #kb-bos.pn .pn-ust { display:flex; align-items:center; gap:12px; }
 #kb-bos.pn .pn-ust h2 { margin:0; font:700 18px/1 var(--f); letter-spacing:-.01em; }
 #kb-bos.pn .pn-ust .pn-tarih { color:var(--soluk); font:500 11.5px/1 var(--mono); }
+/* Henüz gerçek veriye bağlı olmayan bölümün işareti */
+#kb-bos.pn .pn-ornek { font:600 9px/1 var(--f); letter-spacing:.12em; text-transform:uppercase; color:var(--pn-uyari); padding:3px 6px; border-radius:5px; border:1px dashed color-mix(in srgb,var(--pn-uyari) 50%,transparent); margin-left:6px; vertical-align:middle; }
+#kb-bos.pn .pn-oran .pn-ornek { position:absolute; top:10px; right:10px; margin:0; }
 /* Prototip uyarısı: amber, kesik çizgili şerit */
 #kb-bos.pn .pn-demo { display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:12px; font-size:12.5px; color:var(--orta);
   border:1px dashed color-mix(in srgb,var(--pn-uyari) 55%,transparent); background:color-mix(in srgb,var(--pn-uyari) 9%,transparent); }

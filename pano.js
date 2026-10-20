@@ -22,18 +22,36 @@ const ASAMA = [
   { id: 'vade', ad: 'Vadesi dolan tahsilat', ik: 'uyari', tarih: 'Vade', kritik: true }
 ];
 
-// ---- Örnek veri (bugüne göre kurulur; adlar hayali) ----
+// ---- Kurlar: gerçek veri (kullanıcı kararı 20.10.2026: serbest piyasa) ----
+// Anlık (kutucuklar): finans.truncgil.com — serbest piyasa alış / satış / günlük değişim, gram altın dahil; resmi değil. 5 dk'da bir yenilenir.
+// Geçmiş (grafik, küçük çizgiler): Frankfurter — Avrupa Merkez Bankası günlük referans kuru (iş günleri), son 1 yıl. İkisi de tarayıcıdan doğrudan (CORS açık), köprü yok.
+const KUR_ANLIK = 'https://finans.truncgil.com/today.json';
+// api.frankfurter.app → .dev/v1'e yönlendiriyor ve yönlendirmede CORS başlığı yok; doğrudan yeni adres
+const KUR_GECMIS = (para, bas, son) => 'https://api.frankfurter.dev/v1/' + bas + '..' + son + '?from=' + para + '&to=TRY';
+const PARALAR = ['USD', 'EUR', 'GBP'];
+const coz = (s) => parseFloat(String(s).replace('%', '').replace(/\./g, '').replace(',', '.'));
+const isoGun = (t) => t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+
+async function anlikOku() {
+  const j = await (await fetch(KUR_ANLIK, { cache: 'no-store' })).json(), a = {};
+  [...PARALAR, 'gram-altin'].forEach(k => { const x = j[k]; if (x) a[k] = { satis: coz(x['Satış']), degisim: coz(x['Değişim']) }; });
+  const t = String(j.Update_Date || '').match(/(\d\d:\d\d)/);
+  return { kur: a, saat: t ? t[1] : '' };
+}
+async function gecmisOku(bugun) {
+  const bas = new Date(bugun); bas.setFullYear(bas.getFullYear() - 1);
+  const g = {};
+  await Promise.all(PARALAR.map(async p => {
+    const j = await (await fetch(KUR_GECMIS(p, isoGun(bas), isoGun(bugun)))).json();
+    g[p] = Object.keys(j.rates || {}).sort().map(k => ({ t: new Date(k + 'T00:00:00'), v: j.rates[k].TRY }));
+  }));
+  return g;
+}
+
+// ---- Örnek veri (bugüne göre kurulur; adlar hayali): faiz, iş akışı, takvim henüz gerçek veriye bağlı değil ----
 function ornek(bugun) {
-  let tohum = 7; const rnd = () => (tohum = (tohum * 16807) % 2147483647) / 2147483647;
-  const seri = (gun, bas, son, oyna) => {
-    const a = []; let v = bas; for (let i = 0; i < gun; i++) { v += (son - bas) / gun + (rnd() - .5) * oyna; a.push(v); }
-    const f = son - a[gun - 1]; return a.map((x, i) => +(x + f * i / (gun - 1)).toFixed(4));
-  };
   const g = (n) => { const d = new Date(bugun); d.setDate(d.getDate() + n); return d; };
   return {
-    saat: '16:45',
-    kur: { USD: seri(365, 36.9, 42.31, .09), EUR: seri(365, 41.2, 49.07, .14), GBP: seri(365, 48.1, 56.42, .16) },
-    altin: seri(365, 3900, 5285, 30),
     faiz: [['Kas 25', 39.5], ['Ara 25', 38], ['Oca 26', 37], ['Şub 26', 37], ['Mar 26', 35.5], ['Nis 26', 35.5], ['May 26', 34], ['Haz 26', 33], ['Tem 26', 33], ['Ağu 26', 31.5], ['Eyl 26', 30.5], ['Eki 26', 30.5]],
     sonrakiKarar: '19 Kas',
     isler: [
@@ -54,51 +72,62 @@ export function panoAc(el) {
   const bugun = new Date(); bugun.setHours(0, 0, 0, 0);
   const V = ornek(bugun), gunFark = (d) => Math.round((d - bugun) / 864e5);
   const d = { secili: 'onay', aralik: 1, para: 'USD' };
+  const P = { anlik: null, gecmis: null, hataAnlik: false, hataGecmis: false }; // kurlar (gerçek)
+  const ornekCip = '<span class="pn-ornek" title="Henüz gerçek veriye bağlı değil">örnek</span>';
   el.classList.add('pn');
   el.innerHTML =
     '<div class="pn-ust"><h2>Pano</h2><span class="pn-tarih">' + bugun.toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + '</span></div>' +
     // Prototip uyarısı (kullanıcı kararı 20.10.2026): pano canlıda örnek veriyle; bölümler gerçek veriye bağlandıkça kalkar
-    '<div class="pn-demo" role="note">' + ik('uyari') + '<b>Prototip</b><span>Bu panodaki rakamlar ve kayıtlar örnektir; gerçek verilere bağlandıkça değişecek.</span></div>' +
-    '<div><div class="pn-bas"><h3>Piyasa</h3><small>güncellendi ' + V.saat + '</small></div><div class="pn-piyasa" data-pn="piyasa"></div></div>' +
+    '<div class="pn-demo" role="note">' + ik('uyari') + '<b>Prototip</b><span>Kurlar canlı. Faiz, iş akışı ve takvim şimdilik örnektir; gerçek verilere bağlandıkça değişecek.</span></div>' +
+    '<div><div class="pn-bas"><h3>Piyasa</h3><small data-pn="saat">yükleniyor…</small></div><div class="pn-piyasa" data-pn="piyasa"></div></div>' +
     '<div class="pn-iki">' +
-      '<div class="pn-kart"><div class="pn-bas"><h3>Serbest piyasa kuru</h3><div class="pn-pil" data-pn="para"></div><div class="pn-pil pn-sag" data-pn="aralik"></div></div><svg class="pn-g" data-pn="kur"></svg><div class="pn-ipucu" data-pn="kur-ip"></div></div>' +
-      '<div class="pn-kart"><div class="pn-bas"><h3>TCMB politika faizi</h3><small>son ' + V.faiz.length + ' karar</small></div><svg class="pn-g" data-pn="faiz"></svg><div class="pn-ipucu" data-pn="faiz-ip"></div></div>' +
+      '<div class="pn-kart"><div class="pn-bas"><h3 title="Geçmiş: Avrupa Merkez Bankası günlük referans kuru (iş günleri)">Kur geçmişi</h3><div class="pn-pil" data-pn="para"></div><div class="pn-pil pn-sag" data-pn="aralik"></div></div><svg class="pn-g" data-pn="kur"></svg><div class="pn-ipucu" data-pn="kur-ip"></div></div>' +
+      '<div class="pn-kart"><div class="pn-bas"><h3>TCMB politika faizi</h3><small>son ' + V.faiz.length + ' karar</small>' + ornekCip + '</div><svg class="pn-g" data-pn="faiz"></svg><div class="pn-ipucu" data-pn="faiz-ip"></div></div>' +
     '</div>' +
-    '<div><div class="pn-bas"><h3>İş akışı</h3><small data-pn="ozet"></small></div><div class="pn-akis" data-pn="akis"></div></div>' +
+    '<div><div class="pn-bas"><h3>İş akışı</h3><small data-pn="ozet"></small>' + ornekCip + '</div><div class="pn-akis" data-pn="akis"></div></div>' +
     '<div class="pn-iki">' +
-      '<div class="pn-kart"><div class="pn-bas"><h3 data-pn="liste-ad"></h3><small data-pn="liste-say"></small></div><div style="overflow:auto"><table data-pn="liste"></table></div></div>' +
-      '<div class="pn-kart"><div class="pn-bas"><h3>Bu hafta</h3><small>çekim ve teslim</small></div><div class="pn-takvim" data-pn="takvim"></div></div>' +
+      '<div class="pn-kart"><div class="pn-bas"><h3 data-pn="liste-ad"></h3><small data-pn="liste-say"></small>' + ornekCip + '</div><div style="overflow:auto"><table data-pn="liste"></table></div></div>' +
+      '<div class="pn-kart"><div class="pn-bas"><h3>Bu hafta</h3><small>çekim ve teslim</small>' + ornekCip + '</div><div class="pn-takvim" data-pn="takvim"></div></div>' +
     '</div>';
   const $ = (ad) => el.querySelector('[data-pn="' + ad + '"]');
 
-  // Piyasa şeridi: kur kutucukları + faiz
+  // Piyasa şeridi: kur kutucukları (anlık, serbest piyasa; küçük çizgi son 30 iş günü) + faiz (örnek)
   const mini = (s) => {
-    const p = s.slice(-30), mn = Math.min(...p), mx = Math.max(...p);
-    return '<svg class="pn-mini" viewBox="0 0 100 26" preserveAspectRatio="none"><path d="' + p.map((v, i) => (i ? 'L' : 'M') + (i / 29 * 100).toFixed(1) + ' ' + (24 - (v - mn) / (mx - mn || 1) * 22).toFixed(1)).join('') + '" style="fill:none;stroke:var(--pn-s1);stroke-width:1.5" vector-effect="non-scaling-stroke"/></svg>';
+    if (!s || s.length < 2) return '';
+    const p = s.slice(-30).map(x => x.v), n = p.length, mn = Math.min(...p), mx = Math.max(...p);
+    return '<svg class="pn-mini" viewBox="0 0 100 26" preserveAspectRatio="none"><path d="' + p.map((v, i) => (i ? 'L' : 'M') + (i / (n - 1) * 100).toFixed(1) + ' ' + (24 - (v - mn) / (mx - mn || 1) * 22).toFixed(1)).join('') + '" style="fill:none;stroke:var(--pn-s1);stroke-width:1.5" vector-effect="non-scaling-stroke"/></svg>';
   };
-  const oran = (ad, s, k) => {
-    const son = s[s.length - 1], f = (son - s[s.length - 2]) / s[s.length - 2] * 100;
-    return '<div class="pn-kart pn-oran"><div class="pn-oran-ad">' + ad + '</div><div class="pn-deger">' + sayi(son, k) + '</div><div class="pn-fark ' + (f >= 0 ? 'pn-yukari' : 'pn-asagi') + '"><b>' + (f >= 0 ? '▲' : '▼') + ' %' + sayi(Math.abs(f), 2) + '</b>dün</div>' + mini(s) + '</div>';
+  const oran = (ad, k, ond) => {
+    const a = P.anlik && P.anlik.kur[k];
+    if (!a || isNaN(a.satis)) return '<div class="pn-kart pn-oran"><div class="pn-oran-ad">' + ad + '</div><div class="pn-deger">—</div><div class="pn-fark">' + (P.hataAnlik ? 'okunamadı' : 'yükleniyor…') + '</div></div>';
+    const f = a.degisim;
+    return '<div class="pn-kart pn-oran" title="Serbest piyasa satış"><div class="pn-oran-ad">' + ad + '</div><div class="pn-deger">' + sayi(a.satis, ond) + '</div><div class="pn-fark ' + (f > 0 ? 'pn-yukari' : f < 0 ? 'pn-asagi' : '') + '"><b>' + (f > 0 ? '▲' : f < 0 ? '▼' : '—') + ' %' + sayi(Math.abs(f), 2) + '</b>günlük</div>' + mini(P.gecmis && P.gecmis[k]) + '</div>';
   };
   const fs = V.faiz[V.faiz.length - 1][1], fo = V.faiz[V.faiz.length - 2][1];
-  $('piyasa').innerHTML = oran('USD / TRY', V.kur.USD, 4) + oran('EUR / TRY', V.kur.EUR, 4) + oran('GBP / TRY', V.kur.GBP, 4) + oran('Gram altın', V.altin, 0) +
-    '<div class="pn-kart pn-oran"><div class="pn-oran-ad">TCMB politika faizi</div><div class="pn-deger">%' + sayi(fs, 2) + '</div><div class="pn-fark ' + (fs < fo ? 'pn-asagi' : fs > fo ? 'pn-yukari' : '') + '"><b>' + (fs === fo ? '— sabit' : (fs < fo ? '▼ ' : '▲ ') + sayi(Math.abs(fs - fo) * 100, 0) + ' baz puan') + '</b>son karar</div>' +
-    '<div class="pn-fark" style="margin-top:14px">Sonraki karar · ' + V.sonrakiKarar + '</div></div>';
+  function piyasa() {
+    $('piyasa').innerHTML = oran('USD / TRY', 'USD', 4) + oran('EUR / TRY', 'EUR', 4) + oran('GBP / TRY', 'GBP', 4) + oran('Gram altın', 'gram-altin', 2) +
+      '<div class="pn-kart pn-oran">' + ornekCip + '<div class="pn-oran-ad">TCMB faizi</div><div class="pn-deger">%' + sayi(fs, 2) + '</div><div class="pn-fark ' + (fs < fo ? 'pn-asagi' : fs > fo ? 'pn-yukari' : '') + '"><b>' + (fs === fo ? '— sabit' : (fs < fo ? '▼ ' : '▲ ') + sayi(Math.abs(fs - fo) * 100, 0) + ' baz puan') + '</b>son karar</div>' +
+      '<div class="pn-fark" style="margin-top:14px">Sonraki karar · ' + V.sonrakiKarar + '</div></div>';
+    $('saat').textContent = P.anlik ? 'serbest piyasa · ' + P.anlik.saat : P.hataAnlik ? 'kurlar okunamadı' : 'yükleniyor…';
+  }
+  async function anlikYenile() { try { P.anlik = await anlikOku(); P.hataAnlik = false; } catch (e) { P.hataAnlik = true; } piyasa(); }
 
-  // Kur grafiği: tek para birimi, tek eksen; nişangah + ipucu
-  const ARALIK = [['1A', 30], ['3A', 90], ['1Y', 365]];
+  // Kur grafiği: tek para birimi, tek eksen; nişangah + ipucu. Veri: P.gecmis (iş günleri)
+  const ARALIK = [['1A', 30], ['3A', 90], ['1Y', 366]];
   const pil = (ad, liste, secili) => { $(ad).innerHTML = liste.map(x => '<button type="button" data-d="' + x + '" class="' + (x === secili ? 'acik' : '') + '">' + x + '</button>').join(''); };
-  const piller = () => { pil('para', Object.keys(V.kur), d.para); pil('aralik', ARALIK.map(a => a[0]), ARALIK[d.aralik][0]); };
+  const piller = () => { pil('para', PARALAR, d.para); pil('aralik', ARALIK.map(a => a[0]), ARALIK[d.aralik][0]); };
   $('para').onclick = (e) => { const b = e.target.closest('button'); if (b) { d.para = b.dataset.d; piller(); kur(); } };
   $('aralik').onclick = (e) => { const b = e.target.closest('button'); if (b) { d.aralik = ARALIK.findIndex(a => a[0] === b.dataset.d); piller(); kur(); } };
   piller();
 
   function kur() {
     const svg = $('kur'), W = svg.clientWidth, H = 200, sol = 6, sag = 50, ust = 10, alt = 22; if (!W) return;
-    const n = ARALIK[d.aralik][1], u = V.kur[d.para].slice(-n);
+    const tum = P.gecmis && P.gecmis[d.para];
+    if (!tum || tum.length < 2) { svg.innerHTML = '<text x="' + W / 2 + '" y="' + H / 2 + '" text-anchor="middle" style="font:500 12px var(--f);fill:var(--soluk)">' + (P.hataGecmis ? 'Kur geçmişi okunamadı' : 'Yükleniyor…') + '</text>'; svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); return; }
+    const sinir = new Date(bugun); sinir.setDate(sinir.getDate() - ARALIK[d.aralik][1]);
+    const s = tum.filter(p => p.t >= sinir), n = s.length, u = s.map(p => p.v), gunu = (i) => s[i].t;
     const lo = Math.min(...u), hi = Math.max(...u), pay = (hi - lo) * .12 || .1, mn = lo - pay, mx = hi + pay;
     const x = (i) => sol + i / (n - 1) * (W - sol - sag), y = (v) => ust + (1 - (v - mn) / (mx - mn)) * (H - ust - alt);
-    const gunu = (i) => { const t = new Date(bugun); t.setDate(t.getDate() - (n - 1 - i)); return t; };
     svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
     const ham = (mx - mn) / 4, kuv = Math.pow(10, Math.floor(Math.log10(ham))), adim = [1, 2, 2.5, 5, 10].map(m => m * kuv).find(s => s >= ham), ond = adim < 1 ? 2 : 0;
     let h = '<defs><linearGradient id="pn-dolgu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--pn-s1);stop-opacity:.22"/><stop offset="1" style="stop-color:var(--pn-s1);stop-opacity:0"/></linearGradient></defs><g class="pn-eksen">';
@@ -181,7 +210,10 @@ export function panoAc(el) {
     $('takvim').innerHTML = h;
   }
 
-  akis(); liste(); takvim();
+  piyasa(); akis(); liste(); takvim();
+  // Kurlar: anlık hemen ve 5 dk'da bir; geçmiş bir kez (gelince kutucuk çizgileri ve grafik çizilir)
+  anlikYenile(); setInterval(() => { if (el.isConnected && !el.hidden) anlikYenile(); }, 5 * 60 * 1000);
+  gecmisOku(bugun).then(g => { P.gecmis = g; }).catch(() => { P.hataGecmis = true; }).then(() => { piyasa(); kur(); });
   // Grafikler genişliğe göre çizilir: menü daralınca / pencere değişince yeniden
   new ResizeObserver(() => { kur(); faiz(); }).observe(el);
 }
