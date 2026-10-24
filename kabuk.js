@@ -202,7 +202,7 @@ export async function kabukAc({ yol, iste, cikis, ilk }) {
   function ac(id) {
     const m = d.menu.find(x => x.id === id); if (!m) return;
     if (!yaprak(m)) { d.acik.has(id) ? d.acik.delete(id) : d.acik.add(id); ciz(); }
-    if (m.acik) { yukle(m); k.classList.remove('menu'); }
+    if (m.acik) { yukle(m); k.classList.remove('menu'); if (window.abramaIz) window.abramaIz(m.ad); } // gezinti kaydı (kapı, /__iz.js; 24.10.2026)
   }
 
   $('agac').addEventListener('click', (e) => { const b = e.target.closest('.satir'); if (b) ac(b.dataset.id); });

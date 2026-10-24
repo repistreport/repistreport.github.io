@@ -112,7 +112,7 @@ async function modulAc(user, y) {
 // (ağaç menü, arama, modül sahnesi, yükleme göstergeleri); burası yalnız kimliği ve köprüyü verir.
 async function kabukAc(user, y) {
   try {
-    const { kabukAc: kur } = await import('./kabuk.js?s=17');
+    const { kabukAc: kur } = await import('./kabuk.js?s=18');
     await kur({
       yol: y, ilk: MENU.replace(/[^A-Za-z0-9_æ-]/g, ''),
       iste: async (govde) => kopru({ ...govde, idToken: await user.getIdToken(), yol: y.id }),
